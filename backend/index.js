@@ -24,7 +24,13 @@ const app = express();
 
 // Middleware setup
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:5000', 'http://127.0.0.1:5000','https://aloraproduct.netlify.app/'],
+  origin: [
+    'http://localhost:5500', 
+    'http://127.0.0.1:5500', 
+    'http://localhost:5000', 
+    'http://127.0.0.1:5000',
+    'https://aloraproduct.netlify.app' // ✅ FIXED: Aakhiri se '/' hata diya
+  ],
   credentials: true // ZAROORI: Taaki cookies incoming/outgoing access ho sakein
 }));
 
