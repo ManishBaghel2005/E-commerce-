@@ -2,7 +2,7 @@ const isLocal = window.location.hostname === "localhost" || window.location.host
 
 const BASE_URL = isLocal 
     ? "http://localhost:5000" 
-    : "https://your-backend-live-url.onrender.com/api/auth"; 
+    : "https://e-commerce-yf0t.onrender.com"; 
 
 export default BASE_URL;
 
