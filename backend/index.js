@@ -43,6 +43,9 @@ app.use(cookieParser()); // Cookie Parser registration
 // ==========================================
 // path.join aur __dirname use karne se backend uploads folder ko absolute path se accurate locate kar payega
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Sirf folders ko static banayein, poore frontend folder ko nahi!
+app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
+app.use('/static', express.static(path.join(__dirname, '../frontend/static')));
 
 // ==========================================
 // VIEWS & API ROUTING

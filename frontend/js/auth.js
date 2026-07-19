@@ -33,73 +33,51 @@ export function showSuccessModal(title, message, callback) {
 }
 
 // ==========================================
-// 2. ROBUST NAVBAR RENDERING FUNCTION
+// 2. LOGOUT LOGIC (Both Main Site & Admin Sidebar)
 // ==========================================
-export function renderNavbarState() {
-    const authActions = document.getElementById("auth-actions");
-    const storedUser = localStorage.getItem("user");
-
-    if (!authActions) return;
-
-    if (storedUser && storedUser !== "undefined") {
-        try {
-            const user = JSON.parse(storedUser);
-            const displayName = user.name || "User";
-
-            authActions.innerHTML = `
-                <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
-                    <span>Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
-                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm">
-                        Logout
-                    </button>
-                </div>
-            `;
-
-            document.getElementById("logout-btn").addEventListener("click", () => {
-                localStorage.clear();
-                window.location.href = "./index.html";
-            });
-
-        } catch (err) {
-            console.error("LocalStorage Parse Error:", err);
-            localStorage.clear();
-        }
-    } else {
-        authActions.innerHTML = `
-            <a href="./login.html" class="text-base text-black hover:text-gold transition">
-                <i class="fa-solid fa-user"></i>
-            </a>
-        `;
+// Ek common function jo har tarah ke logout button par kaam karega
+async function handleLogout() {
+    try {
+        await fetch(`${BASE_URL}/api/auth/logout`, { 
+            method: "POST",
+            credentials: "include" 
+        });
+        localStorage.clear();
+        window.location.href = "./login.html";
+    } catch (err) {
+        console.error("Logout error:", err);
+        localStorage.clear();
+        window.location.href = "./login.html";
     }
 }
 
-// ==========================================
-// 3. LIFECYCLE MANAGEMENT (Navbar Mount Watch)
-// ==========================================
-document.addEventListener("partialsLoaded", renderNavbarState);
-if (document.readyState === "complete" || document.readyState === "interactive") {
-    renderNavbarState();
-} else {
-    document.addEventListener("DOMContentLoaded", renderNavbarState);
-}
-
-const safetyInterval = setInterval(() => {
-    if (document.getElementById("auth-actions")) {
-        renderNavbarState();
-        clearInterval(safetyInterval);
-    }
-}, 100);
-setTimeout(() => clearInterval(safetyInterval), 5000);
-
-// ==========================================
-// 4. LOGIN FORM SUBMISSION INTERCEPTOR
-// ==========================================
-const myLoginForm = document.getElementById("loginForm");
-if (myLoginForm) {
-    myLoginForm.addEventListener("submit", async (e) => {
+// Pure document par listener laga diya taaki kisi bhi page par koi bhi logout button ho, wo kaam kare
+document.addEventListener("click", (e) => {
+    // 1. Agar admin sidebar ka logout button click hua ho
+    if (e.target && (e.target.id === "adminLogoutBtn" || e.target.closest("#adminLogoutBtn"))) {
         e.preventDefault();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
+        handleLogout();
+    }
+    // 2. Agar website ke main navbar ka logout button click hua ho
+    if (e.target && (e.target.id === "logout-btn" || e.target.closest("#logout-btn"))) {
+        e.preventDefault();
+        handleLogout();
+    }
+});
+
+// ==========================================
+// 3. LOGIN FORM SUBMISSION INTERCEPTOR
+// ==========================================
+document.addEventListener("submit", async (e) => {
+    if (e.target && e.target.id === "loginForm") {
+        e.preventDefault(); // Browser refresh permanently block
+        
+        const emailEl = document.getElementById("email");
+        const passwordEl = document.getElementById("password");
+        if (!emailEl || !passwordEl) return;
+
+        const email = emailEl.value.trim();
+        const password = passwordEl.value;
 
         try {
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -112,10 +90,11 @@ if (myLoginForm) {
             const data = await response.json();
 
             if (response.ok) {
-                // FIXED: Direct storage stringify validation
+                // Pehle localStorage me data set karenge
                 localStorage.setItem("user", JSON.stringify(data.user)); 
                 if (data.token) localStorage.setItem("token", data.token);
 
+                // Role ke mutabik target url select karenge
                 let targetUrl = "./index.html"; 
                 if (data.user && data.user.role === "admin") {
                     targetUrl = "./admin.html";
@@ -133,128 +112,45 @@ if (myLoginForm) {
             console.error("Login Error:", error);
             showSuccessModal("Error", "Server se contact nahi ho paa raha hai.", null);
         }
-    });
-}
+    }
+});
 
 // ==========================================
-// 5. REGISTER FORM SUBMISSION INTERCEPTOR
+// 4. NAVBAR STATE RENDERING (For main index.html)
 // ==========================================
-const myRegisterForm = document.getElementById("registerForm");
-if (myRegisterForm) {
-    myRegisterForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const phone = document.getElementById("phone").value.trim();
+export function renderNavbarState() {
+    const authActions = document.getElementById("auth-actions");
+    if (!authActions) return; 
 
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
         try {
-            const response = await fetch(`${BASE_URL}/api/auth/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password, phone })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                showSuccessModal("Registration Successful!", "Aapka account ban gaya hai. Ab aap login kar sakte hain.", () => {
-                    window.location.href = "./login.html";
-                });
-            } else {
-                showSuccessModal("Registration Failed", data.message || "Valid details enter karein.", null);
-            }
-        } catch (error) {
-            console.error("Register Error:", error);
-            showSuccessModal("Error", "Server se contact nahi ho paa raha hai.", null);
+            const user = JSON.parse(storedUser);
+            authActions.innerHTML = `
+                <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
+                    <span>Hi, <b class="text-[#2A2A24] font-bold uppercase">${user.name || "User"}</b></span>
+                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm">
+                        Logout
+                    </button>
+                </div>
+            `;
+        } catch (err) {
+            localStorage.clear();
         }
-    });
+    } else {
+        authActions.innerHTML = `
+            <a href="./login.html" class="text-base text-black hover:text-gold transition">
+                <i class="fa-solid fa-user"></i>
+            </a>
+        `;
+    }
 }
 
-// ==========================================
-// 6. FORGOT PASSWORD & VIEW TOGGLE LOGIC (🚀 NEW)
-// ==========================================
-const showForgotBtn = document.getElementById("showForgotBtn");
-const backToLoginBtn = document.getElementById("backToLoginBtn");
-const loginSection = document.getElementById("loginSection");
-const forgotSection = document.getElementById("forgotSection");
-
-if (showForgotBtn && backToLoginBtn && loginSection && forgotSection) {
-    showForgotBtn.addEventListener("click", () => {
-        loginSection.classList.add("hidden");
-        forgotSection.classList.remove("hidden");
-    });
-    backToLoginBtn.addEventListener("click", () => {
-        forgotSection.classList.add("hidden");
-        loginSection.classList.remove("hidden");
-    });
-}
-
-const myForgotForm = document.getElementById("forgotForm");
-if (myForgotForm) {
-    myForgotForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("forgotEmail").value.trim();
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                showSuccessModal("Email Sent!", "Password reset link aapke email par bhej diya gaya hai.", () => {
-                    forgotSection.classList.add("hidden");
-                    loginSection.classList.remove("hidden");
-                });
-            } else {
-                showSuccessModal("Failed", data.message || "Email send nahi ho saka.", null);
-            }
-        } catch (error) {
-            console.error("Forgot Error:", error);
-            showSuccessModal("Error", "Server connectivity error.", null);
-        }
-    });
-}
-
-// ==========================================
-// 7. RESET PASSWORD INTERCEPTOR
-// ==========================================
-const myResetForm = document.getElementById("resetForm");
-if (myResetForm) {
-    myResetForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const password = document.getElementById("password").value;
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
-
-        if (!token) {
-            showSuccessModal("Error", "Invalid ya expired reset token link hai.", null);
-            return;
-        }
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/auth/reset-password/${token}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                showSuccessModal("Password Updated!", "Aapka password badal gaya hai. Naye password se login karein.", () => {
-                    window.location.href = "./login.html";
-                });
-            } else {
-                showSuccessModal("Reset Failed", data.message || "Password change nahi ho saka.", null);
-            }
-        } catch (error) {
-            console.error("Reset Password Error:", error);
-            showSuccessModal("Error", "Server respond nahi kar raha hai.", null);
-        }
-    });
+document.addEventListener("partialsLoaded", renderNavbarState);
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    renderNavbarState();
+} else {
+    document.addEventListener("DOMContentLoaded", renderNavbarState);
 }

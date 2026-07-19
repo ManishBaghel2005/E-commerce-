@@ -54,13 +54,29 @@ router.post('/api/auth/logout', logout);
 // PROTECTED PAGES SERVING (Direct URL Protection)
 // ==========================================
 
-// Jab koi direct browser me URL /admin.html type karega, toh yeh block karega
-router.get('/admin.html', protectView, authorizeRoles('admin'), (req, res) => {
-  // Apne system ke hisab se exact path pass karein
-  res.sendFile(path.join(__dirname, '../../frontend/admin.html')); 
+// ==========================================
+// PROTECTED PAGES SERVING (Direct URL Protection)
+// ==========================================
+
+// 1. Saare Admin Pages ki list (Aapke images ke mutabik saare pages)
+const adminPages = [
+  '/admin.html',
+  '/addnewproduct.html',
+  '/adminleadshow.html',
+  '/adminproduct.html',
+  '/adminupdateproduct.html',
+  '/adminUserquery.html'
+];
+
+// 2. Ek hi baar me saare pages par protection loop
+adminPages.forEach((page) => {
+  router.get(page, protectView, authorizeRoles('admin'), (req, res) => {
+    // Ye line ensure karegi ki bina login ke koi inme se kisi page ko na dekh sake
+    res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
+  });
 });
 
-// Jab koi direct browser me URL /seoadmin.html type karega
+// SEO Admin ke liye alag se protection (Jaisa aapka pehle tha)
 router.get('/seoadmin.html', protectView, authorizeRoles('seoadmin', 'admin'), (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/seoadmin.html'));
 });
