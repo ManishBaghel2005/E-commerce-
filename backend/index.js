@@ -12,7 +12,7 @@ import dns from "dns";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import User from "./models/UserAuth.models.js"; 
+import User from "./models/userAuth.models.js"; 
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 dotenv.config();
