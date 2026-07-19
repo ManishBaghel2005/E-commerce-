@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alora Radiance</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap&subset=devanagari" rel="stylesheet">
+   <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    ink: '#152219',
+                    'ink-light': '#1F3327',
+                    'ink-soft': '#28402F',
+                    parchment: '#F7F2E7',
+                    card: '#FFFFFF',
+                    clay: '#A24C3D',
+                    'clay-light': '#C97E63',
+                    'clay-dark': '#7E3A2F',
+                    sage: '#6C8763',
+                    'sage-light': '#E7ECDF',
+                    gold: '#BB9556',
+                    ash: '#6B685F',
+                },
+                fontFamily: {
+                   
+                    robot: ['"PT Sans"', 'ui-robot', 'Georgia', 'robot'],
+                    sans: ['"PT Sans"', 'Manrope', 'sans-serif'],
+                    roboto: ['"Roboto Mono"', 'monospace'],
+                },
+            }
+        }
+    }
+</script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .product-card:hover .add-to-cart-btn { transform: translateY(0); opacity: 1; }
+        .label-perforation {
+            background-image: radial-gradient(circle, #E4DCC9 1.5px, transparent 1.5px);
+            background-size: 8px 8px;
+        }
+        .dotted-rule {
+            background-image: linear-gradient(to right, #C9BE9F 40%, transparent 0%);
+            background-position: bottom;
+            background-size: 10px 1.5px;
+            background-repeat: repeat-x;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        details summary::-webkit-details-marker { display: none; }
+        
+
+        @keyframes appear{
+            from{
+                opacity: 0.3;
+                scale:0.5
+            }to{
+                opacity: 1;
+                scale:1,
+            }
+
+        }
+        .greensection{
+            animation: appear linear;
+            animation-timeline: view();
+            animation-range: entry 0;
+        }
+        
+ .animate-marquee {
+  display: inline-block;
+  padding-left: 100%; /* Text screen ke right side (bahar) se start hoga */
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0); /* Puri screen ke left me end tak jayega */
+  }
+}
+
+/* Hover karne par pause hoga */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+
+/* Search container jo shuru me hide rahega */
+#search-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 999;
+    
+    /* Animation ke liye transitions */
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Jab 'open' class add hogi to ye upar se niche aayega */
+#search-container.open {
+    transform: translateY(0);
+}
+
+/* Input field styling */
+#search-input {
+    width: 60%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Close button styling */
+#search-close-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 15px;
+    color: black;
+}
+    </style>
+</head>
+<body class="bg-parchment font-sans text-[#2A2A24] antialiased">
+
+    <!-- ============Pop Up ==================== -->
+  
+
+    <div id="discountPopup" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 ease-out">
+        
+        <div id="popupBox" class="relative w-full max-w-md mx-4 bg-white p-8 rounded-2xl shadow-2xl text-center transform scale-95 transition-transform duration-300 ease-out">
+            
+            <button id="closePopup" class="absolute top-4 right-4 text-gray-400 hover:text-[#2A2A24] text-2xl font-semibold p-1 transition-colors focus:outline-none" aria-label="Close popup">
+                &times;
+            </button>
+
+            <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-wider mb-5">
+                <span>🔥</span> Limited Offer
+            </div>
+
+            <h2 class="text-3xl font-extrabold tracking-tight mb-3">
+                Exclusive Deal!
+            </h2>
+
+            <p class="text-base leading-relaxed text-gray-600 mb-6">
+                Be one of the <span class="font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">First 100 Users</span> and grab a flat <span class="font-bold text-[#2A2A24] border-b-2 border-orange-500">10% DISCOUNT</span> on your order.
+            </p>
+
+            <button id="claimBtn" class="w-full py-3.5 px-6 bg-[#2A2A24] text-white font-semibold rounded-xl hover:bg-orange-600 shadow-md hover:shadow-orange-600/20 active:scale-[0.98] transition-all duration-200">
+                Ok Alora
+            </button>
+            
+        </div>
+    </div>
+
+    <!-- ============ NAV ============ -->
+   <div class="overflow-hidden bg-[#fb6900] p-2 shadow-sm border border-[#E3DAC6] ">
+  
+  <div class="animate-marquee whitespace-nowrap">
+    <p class="text-[white] text-sm font-medium tracking-wide inline-block">
+      Enjoy First order 10%  Discount  &nbsp;•&nbsp;       Special Delivery By Founder
+    </p>
+  </div>
+
+</div>
+
+
+
+<div id="navbar-placeholder"></div>
+
+
+<div class="flex w-full h-[13vh] md:h-[60vh] overflow-hidden relative group">
+   <button id="prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-ink w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100">
+        <i class="fa-solid fa-angle-left text-lg"></i>
+    </button>
+    <button id="next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-ink w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"><i class="fa-solid fa-angle-right"></i></button>
+    
+   <div id="slider-track" class="flex w-full h-full transition-transform duration-700 ease-in-out">
+    
+    <a href="./moreproduct.html" class="w-full shrink-0 block">
+        <img src="./static/alora6.jpg" alt="" class="w-full h-[13vh] md:h-[60vh] object-cover">
+    </a>
+    
+    <a href="./moreproduct.html" class="w-full shrink-0 block">
+        <img src="./static/alora2.jpg" alt="" class="w-full h-[13vh] md:h-[60vh] object-cover">
+    </a>
+
+    <a href="./moreproduct.html" class="w-full shrink-0 block">
+        <img src="./static/alora3.jpg" alt="" class="w-full h-[13vh] md:h-[60vh] object-cover">
+    </a>
+
+    <a href="./moreproduct.html" class="w-full shrink-0 block">
+        <img src="./static/alora4.jpg" alt="" class="w-full h-[13vh] md:h-[60vh] object-cover">
+    </a>
+
+    <a href="./moreproduct.html" class="w-full shrink-0 block">
+        <img src="./static/alora5.jpg" alt="" class="w-full h-[13vh] md:h-[60vh] object-cover">
+    </a>
+
+    <a href="./moreproduct.html" class="w-full shrink-0 block">
+        <img src="./static/alora1.jpg" alt="" class="w-full h-[13vh] md:h-[60vh] object-cover">
+    </a>
+
+</div>
+</div>
+
+ <!-- ============ FEATURED PRODUCTS ============ -->
+    <section id="featured" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2">The Collection</p>
+                <h2 class="text-3xl font-robot  font-medium text-ink">Featured Products</h2>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" onclick="slideProducts('left')" class="w-11 h-11 rounded-full border border-ink/15 flex items-center justify-center hover:bg-ink hover:text-parchment text-ink transition">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <button type="button" onclick="slideProducts('right')" class="w-11 h-11 rounded-full border border-ink/15 flex items-center justify-center hover:bg-ink hover:text-parchment text-ink transition">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="greensection overflow-hidden w-full py-4">
+            <div id="productSliderWrapper" class="flex gap-6 transition-transform duration-500 ease-out" style="transform: translateX(0px);">
+                <!-- Product cards are injected here dynamically by loadSliderProducts() in main.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ HERO ============ -->
+    <header class="max-w-7xl mx-auto px-4 py-14 md:py-20 grid md:grid-cols-2 gap-12 items-center">
+        <div class="animate__animated animate__fadeInLeft pl-8">
+           
+            <h1 class="text-4xl md:text-6xl font-robot  font-medium text-ink leading-[1.08] mb-6">
+                Bottled brilliance,<br> for daily rituals.
+            </h1>
+            <p class="text-[#5C594E] text-base mb-8 max-w-md leading-relaxed">Experience luminous skin crafted by nature. Our premium serums infuse deep hydration and natural radiance into your everyday routine — every batch lab-tested, every ingredient disclosed.</p>
+            <div class="flex items-center gap-6">
+                <a href="./moreproduct.html"  class="bg-clay text-parchment px-7 py-3.5 rounded-md shadow-sm hover:bg-ink-light transition tracking-wide text-sm font-semibold">Explore Body Lotion</a>
+                <a href="#featured" class="text-sm font-semibold text-ink border-b-2 border-clay pb-1 hover:text-clay transition">See bestsellers</a>
+            </div>
+            <div class="flex items-center gap-8 mt-10 pt-8 border-t border-[#DDD4BC]">
+                <div>
+                    <p class="text-sm font-robot text-ash  uppercase tracking-widest">Premium Ingredients</p>
+                </div>
+                <div class="w-px h-8 bg-[#DDD4BC]"></div>
+                <div>
+                    <p class="text-sm font-sans text-ash  uppercase tracking-widest">Recyclable Packaging</p>
+                </div>
+                <div class="w-px h-8 bg-[#DDD4BC]"></div>
+                <div>
+                    <p class="text-2xl font-robot text-ink">4.8/5</p>
+                    <p class="text-[11px] uppercase tracking-widest text-ash">Customer rated</p>
+                </div>
+            </div>
+        </div>
+        <div class="animate__animated animate__fadeInRight flex justify-center">
+    <div class="relative bg-white p-3 rounded-2xl shadow-xl border border-[#EAE3CF] w-full max-w-md overflow-hidden">
+        
+        <!-- Main dynamic snapping slider layout container -->
+        <div id="auto-slider" class="bg-sage-light rounded-xl p-6 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-10 no-scrollbar">
+            
+            <!-- FIXED: w-full, flex-shrink-0, and snap-center moved onto the <a> tags -->
+            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                <img src="./static/combo1.jpeg" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
+            </a>
+            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                <img src="./static/combo2.jpeg" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
+            </a>
+            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                <img src="./static/combo3.jpeg" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
+            </a>
+            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                <img src="./static/combo4.jpeg" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
+            </a>
+            
+        </div>
+    </div>
+</div>
+    </header>
+
+    <!-- ============ SHOP BY CATEGORY ============ -->
+    <section class="max-w-7xl mx-auto px-4 pb-16 ">
+        <div class="text-center mb-10">
+            <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2">Shop By Concern</p>
+            <h2 class="text-3xl font-robot  font-medium text-ink">Find Your Ritual</h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-5 ">
+            <a href="./moreproduct.html" class="group bg-white rounded-2xl border border-[#ECE4CE] p-6 flex flex-col items-center text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                <div class="w-16 h-16 rounded-full bg-clay/10 text-clay flex items-center justify-center mb-4 group-hover:bg-clay group-hover:text-white transition">
+                    <i class="fa-solid fa-face-smile text-xl"></i>
+                </div>
+                <h3 class="font-robot font-semibold text-ink text-sm mb-1">Skincare</h3>
+                <p class="text-xs text-ash mb-3">Serums, creams &amp; cleansers</p>
+                <span class="text-[11px] font-semibold uppercase tracking-widest text-clay">Shop Now <i class="fa-solid fa-arrow-right ml-0.5 text-[10px]"></i></span>
+            </a>
+
+            <a href="./moreproduct.html" class="group bg-white rounded-2xl border border-[#ECE4CE] p-6 flex flex-col items-center text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                <div class="w-16 h-16 rounded-full bg-gold/15 text-gold flex items-center justify-center mb-4 group-hover:bg-gold group-hover:text-white transition">
+                    <i class="fa-solid fa-pump-soap text-xl"></i>
+                </div>
+                <h3 class="font-robot font-semibold text-ink text-sm mb-1">Bodycare</h3>
+                <p class="text-xs text-ash mb-3">Lotions, washes &amp; scrubs</p>
+                <span class="text-[11px] font-semibold uppercase tracking-widest text-gold">Shop Now <i class="fa-solid fa-arrow-right ml-0.5 text-[10px]"></i></span>
+            </a>
+
+            
+        </div>
+    </section>
+
+   
+
+
+    <!-- ============ TOXIN-FREE PROMISE ============ -->
+    <section class="bg-ink-light py-14 border-b border-gold/20">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="text-xs font-bold tracking-[0.25em] uppercase text-gold mb-2">Alora Radiance</p>
+            <h2 class="text-2xl md:text-3xl font-robot  font-medium text-parchment mb-10">Nothing to Hide. Nothing Harmful.</h2>
+            <div class=" grid  grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-ban text-lg "></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">Parabens</span>
+                </div>
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-ban text-lg"></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">SLS</span>
+                </div>
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-ban text-lg"></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">Mineral Oil</span>
+                </div>
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-ban text-lg"></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">Silicones</span>
+                </div>
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-ban text-lg"></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">Artificial Colour</span>
+                </div>
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-ban text-lg"></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">Vegan</span>
+                </div>
+                <div class="flex hover:scale-110 ease-in transition-all duration-200 flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full border border-gold/30 flex items-center justify-center text-gold"><i class="fa-solid fa-paw text-lg"></i></div>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-parchment/80">Cruelty-Free</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============ WHY Alora Radiance ============ -->
+    <section class="bg-parchment py-20 border-b border-[#E7DFC7]">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-3">Our Standard</p>
+            <h2 class="text-3xl md:text-4xl font-robot  font-medium text-ink mb-3">The Future of Personal Care is Here</h2>
+            <p class="text-sm text-ash max-w-xl mx-auto mb-14 leading-relaxed">
+                Embrace Alora Radiance, where each element is chosen for its scientific merit, offering you authentic, effective skincare solutions.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+                <div class="flex flex-col items-center px-4">
+                    <div class="w-[72px] hover:scale-110 ease-in transition-all duration-200 h-[72px] flex items-center justify-center text-ink bg-white border-2 border-gold/30 rounded-full mb-5 ring-4 ring-[#EFE8D2]">
+                        <i class="fa-solid fa-circle-nodes text-xl"></i>
+                    </div>
+                    <h3 class="text-base font-robot font-semibold text-ink mb-2">Transparency</h3>
+                    <p class="text-xs text-ash leading-relaxed max-w-[230px]">
+                        Full disclosure of ingredients used &amp; their exact, scientifically tested concentration.
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-center px-4">
+                    <div class="w-[72px] hover:scale-110 ease-in transition-all duration-200 h-[72px] flex items-center justify-center text-ink bg-white border-2 border-gold/30 rounded-full mb-5 ring-4 ring-[#EFE8D2]">
+                        <i class="fa-solid fa-flask-vial text-xl"></i>
+                    </div>
+                    <h3 class="text-base font-robot font-semibold text-ink mb-2">Efficacy</h3>
+                    <p class="text-xs text-ash leading-relaxed max-w-[230px]">
+                        Formulations rigorously developed and tested in our certified in-house laboratories.
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-center px-4">
+                    <div class="w-[72px] hover:scale-110 ease-in transition-all duration-200 h-[72px] flex items-center justify-center text-ink bg-white border-2 border-gold/30 rounded-full mb-5 ring-4 ring-[#EFE8D2]">
+                        <i class="fa-solid fa-droplet text-xl"></i>
+                    </div>
+                    <h3 class="text-base font-robot font-semibold text-ink mb-2">Affordable Luxury</h3>
+                    <p class="text-xs text-ash leading-relaxed max-w-[230px]">
+                        Premium dermatological skincare, made highly accessible and affordable to all.
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-center px-4">
+                    <div class="w-[72px] hover:scale-110 ease-in transition-all duration-200 h-[72px] flex items-center justify-center text-ink bg-white border-2 border-gold/30 rounded-full mb-5 ring-4 ring-[#EFE8D2]">
+                        <i class="fa-solid fa-earth-americas text-xl"></i>
+                    </div>
+                    <h3 class="text-base font-robot font-semibold text-ink mb-2">Only The Best</h3>
+                    <p class="text-xs text-ash leading-relaxed max-w-[230px]">
+                        100% pure, potent raw ingredients ethically sourced from across the entire globe.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ GREEN INITIATIVE + SAFETY ============ -->
+    <section class="bg-white py-2 md:20 sm:p-2 border-b border-[#E7DFC7]">
+        <div class="max-w-7xl mx-auto px-1 md:px-4">
+
+           <div class="greensection bg-ink scale-90 rounded-2xl py-10 px-4 md:p-14 text-center border border-gold/20 shadow-sm max-w-7xl mx-auto mb-2 relative overflow-hidden opacity-0 translate-y-10 transition-all duration-1000 ease-out" id="green-initiative-section">
+    <i class="fa-solid fa-seedling text-white/5 text-9xl absolute -bottom-8 -left-8 pointer-events-none"></i>
+    <i class="fa-solid fa-leaf text-white/5 text-9xl absolute -top-8 -right-8 pointer-events-none"></i>
+
+   
+    
+    <h2 class="text-2xl md:text-3xl font-robot  font-medium text-white mt-6 mb-3">We Plant Goodness</h2>
+    
+    <div id="tree-counter" class="text-4xl md:text-5xl font-robot font-semibold text-gold tracking-wide my-4 transition-transform duration-300">0+</div>
+    
+    <p class="text-sm text-parchment/70 max-w-md mx-auto mb-8 leading-relaxed">
+        Trees have got life already! Every single time you order from us, we plant a real native tree on your behalf.
+    </p>
+    
+    <a href="./aboutus.html" class="bg-clay hover:bg-clay-dark text-white font-semibold text-xs uppercase tracking-[0.2em] px-7 py-3 rounded-md transition hover:scale-105 active:scale-95 duration-200">
+        Know More
+    </a>
+</div>
+
+            <div class="text-center">
+                <h3 class="text-xs font-bold text-ash uppercase tracking-[0.3em] mb-10">Super Safe Standards</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+                    <div class="flex items-start gap-4 text-left p-5 bg-parchment rounded-xl border border-[#E7DFC7]">
+                        <div class="w-12 h-12 rounded-full bg-clay/10 text-clay flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-user-shield text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-robot font-semibold text-ink mb-1">Dermatologically Tested</h4>
+                            <p class="text-xs text-ash leading-relaxed">
+                                We ensure each batch is tested clinically on sensitive human skin to guarantee complete safety.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 text-left p-5 bg-parchment rounded-xl border border-[#E7DFC7]">
+                        <div class="w-12 h-12 rounded-full bg-sage/15 text-sage flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-square-check text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-robot font-semibold text-ink mb-1">FDA Approved Standards</h4>
+                            <p class="text-xs text-ash leading-relaxed">
+                                Alora Radiance conforms perfectly to international systems, making products 100% safe for regular use.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 text-left p-5 bg-parchment rounded-xl border border-[#E7DFC7]">
+                        <div class="w-12 h-12 rounded-full bg-gold/15 text-gold flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-shield-heart text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-robot font-semibold text-ink mb-1">Made Safe Certified</h4>
+                            <p class="text-xs text-ash leading-relaxed">
+                                The clean seal ensures that your cosmetic contains absolute zero toxic ingredients or synthetic filters.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============ INGREDIENT SPOTLIGHT ============ -->
+    <section class="bg-parchment py-20 border-b border-[#E7DFC7]">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="greensection text-center mb-14">
+                <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-3">Goodness Inside</p>
+                <h2 class="text-3xl md:text-4xl font-robot  font-medium text-ink mb-3">Nature's Actives, Backed by Science</h2>
+                <p class="text-sm text-ash max-w-xl mx-auto leading-relaxed"> hero ingredients, chosen for what they actually do for your skin — no filler botanicals, no vague "extracts."</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Ingredient 01 - Saffron -->
+    <div class="bg-white hover:scale-110 ease-in-out transition-all duration-200 rounded-2xl border border-[#ECE4CE] overflow-hidden">
+        <div class="border-b border-dashed border-[#E3D9BC] px-5 pt-4 pb-2">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-clay">Ingredient 01</span>
+        </div>
+        <div class="p-5">
+            <div class="w-12 h-12 rounded-full bg-clay/10 text-clay flex items-center justify-center mb-4">
+                <i class="fa-solid fa-seedling text-lg"></i>
+            </div>
+            <h3 class="font-robot font-semibold text-ink text-base mb-1.5">Saffron</h3>
+            <!-- Saffron के अनुसार पैराग्राफ -->
+            <p class="text-xs text-ash leading-relaxed">Infuses skin with a natural, golden glow, fades dark spots, and provides rich antioxidants for a brighter complexion.</p>
+        </div>
+    </div>
+
+    <!-- Ingredient 02 - Shea Butter -->
+    <div class="bg-white hover:scale-110 ease-in-out transition-all duration-200 rounded-2xl border border-[#ECE4CE] overflow-hidden">
+        <div class="border-b border-dashed border-[#E3D9BC] px-5 pt-4 pb-2">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-clay">Ingredient 02</span>
+        </div>
+        <div class="p-5">
+            <div class="w-12 h-12 rounded-full bg-gold/15 text-gold flex items-center justify-center mb-4">
+                <i class="fa-solid fa-jar text-lg"></i>
+            </div>
+            <h3 class="font-robot font-semibold text-ink text-base mb-1.5">Shea Butter</h3>
+            <!-- Shea Butter के अनुसार पैराग्राफ -->
+            <p class="text-xs text-ash leading-relaxed">Deeply nourishes and locks in intense moisture, healing dry skin while leaving it incredibly soft and supple.</p>
+        </div>
+    </div>
+
+    <!-- Ingredient 03 - Retinol -->
+    <div class="bg-white hover:scale-110 ease-in-out transition-all duration-200 rounded-2xl border border-[#ECE4CE] overflow-hidden">
+        <div class="border-b border-dashed border-[#E3D9BC] px-5 pt-4 pb-2">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-clay">Ingredient 03</span>
+        </div>
+        <div class="p-5">
+            <div class="w-12 h-12 rounded-full bg-sage/15 text-sage flex items-center justify-center mb-4">
+                <i class="fa-solid fa-atom text-lg"></i>
+            </div>
+            <h3 class="font-robot font-semibold text-ink text-base mb-1.5">Retinol</h3>
+            <!-- Retinol के अनुसार पैराग्राफ -->
+            <p class="text-xs text-ash leading-relaxed">Accelerates skin cell turnover to visibly reduce fine lines, refine pores, and smooth out uneven skin texture.</p>
+        </div>
+    </div>
+
+    <!-- Ingredient 04 - Aloe Vera -->
+    <div class="bg-white hover:scale-110 ease-in-out transition-all duration-200 rounded-2xl border border-[#ECE4CE] overflow-hidden">
+        <div class="border-b border-dashed border-[#E3D9BC] px-5 pt-4 pb-2">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-clay">Ingredient 04</span>
+        </div>
+        <div class="p-5">
+            <div class="w-12 h-12 rounded-full bg-ink/10 text-ink flex items-center justify-center mb-4">
+                <i class="fa-solid fa-leaf text-lg"></i>
+            </div>
+            <h3 class="font-robot font-semibold text-ink text-base mb-1.5">Aloe Vera</h3>
+            <!-- Aloe Vera के अनुसार पैराग्राफ -->
+            <p class="text-xs text-ash leading-relaxed">Instantly soothes redness and irritation, providing lightweight hydration that cools and calms the skin.</p>
+        </div>
+    </div>
+</div>
+        </div>
+    </section>
+
+    <!-- =============Some Face image TO redirect ============= -->
+     <section class="p-5 max-w-7xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        
+        <div class="flex flex-col group">
+            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2">
+                    <img src="./static/before and after image.jpeg"  alt="Uneven Tone" class="w-[288px] h-[216px] object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+                </div>
+                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Uneven Tone</span>
+            </a>
+        </div>
+
+        <div class="flex flex-col group">
+            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2">
+                    <img src="./static/faceskin2.png" alt="Acne control" class="w-full h-auto object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+                </div>
+                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Acne control</span>
+            </a>
+        </div>
+
+        <div class="flex flex-col group">
+            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2">
+                    <img src="./static/faceskin3.png" alt="Oiliness" class="w-full h-auto object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+                </div>
+                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Oiliness</span>
+            </a>
+        </div>
+
+        <div class="flex flex-col group">
+            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2">
+                    <img src="./static/faceskin4.png" alt="Wrinkles" class="w-full h-auto object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+                </div>
+                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Wrinkles</span>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+    <!-- ============ OUR STORY ============ -->
+    <section class="bg-white py-20 border-b border-[#E7DFC7]">
+        <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-14 items-center">
+            <div class="relative bg-sage-light rounded-2xl p-12 label-perforation flex items-center justify-center h-80 md:h-96">
+              <img src="./static/Advertisebanner.png"  class="w-full " alt="Founder Logo">
+            </div>
+            <div>
+                <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-3">Our Story</p>
+                <h2 class="text-3xl font-robot  font-medium text-ink mb-5 leading-tight">Started in a small kitchen, not a boardroom.</h2>
+                <p class="text-sm text-[#5C594E] leading-relaxed mb-4">
+                    Alora Radiance began with a simple frustration: skincare labels nobody could actually read. So we set out to build a brand where every jar lists exactly what's inside, at exactly what concentration — formulated in our own labs, tested on real skin, and never on animals.
+                </p>
+                <p class="text-sm text-[#5C594E] leading-relaxed mb-6">
+                    Today that same promise powers everything we make, from our bestselling Daily Radiance Cream to the tree we plant with every single order.
+                </p>
+                <p class="font-robot  text-ink text-lg">— Team Alora Radiance</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="max-w-7xl mx-auto px-4 py-3 md:py-20 relative">
+        <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2 text-center">In Their Words</p>
+        <h2 class="text-3xl font-robot  font-medium text-ink mb-12 text-center">
+            What Our Customers Say
+        </h2>
+
+        <div class="relative max-w-2xl mx-auto px-4">
+
+            <div class="overflow-hidden rounded-2xl shadow-md border border-[#ECE4CE] bg-white">
+                <div id="testimonialContainer" class="flex transition-transform duration-500 ease-out">
+
+                    <div class="w-full flex-shrink-0 p-10">
+                        <i class="fa-solid fa-quote-left text-clay/20 text-3xl mb-4"></i>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-sage-light text-sage rounded-full flex items-center justify-center font-robot font-semibold text-lg">
+                                M
+                            </div>
+                            <div>
+                                <h4 class="font-robot font-semibold text-sm flex items-center gap-1.5 text-ink">
+                                    Manish <i class="fa-solid fa-circle-check text-clay text-xs"></i>
+                                </h4>
+                                <div class="text-gold text-xs flex gap-0.5 mt-0.5">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[#5C594E] leading-relaxed ">
+                            "This product works like magic on my skin. I have sensitive skin, and it provides amazing results without breakouts. Highly recommended!"
+                        </p>
+                    </div>
+
+                    <div class="w-full flex-shrink-0 p-10">
+                        <i class="fa-solid fa-quote-left text-clay/20 text-3xl mb-4"></i>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-sage-light text-sage rounded-full flex items-center justify-center font-robot font-semibold text-lg">
+                                N
+                            </div>
+                            <div>
+                                <h4 class="font-robot font-semibold text-sm flex items-center gap-1.5 text-ink">
+                                    Nimish <i class="fa-solid fa-circle-check text-clay text-xs"></i>
+                                </h4>
+                                <div class="text-gold text-xs flex gap-0.5 mt-0.5">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[#5C594E] leading-relaxed ">
+                            "The glow is unmatched. It has a lightweight texture that absorbs instantly. It's safe to say it's my permanent dynamic daily cleanser choice now."
+                        </p>
+                    </div>
+
+                    <div class="w-full flex-shrink-0 p-10">
+                        <i class="fa-solid fa-quote-left text-clay/20 text-3xl mb-4"></i>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-sage-light text-sage rounded-full flex items-center justify-center font-robot font-semibold text-lg">
+                                A
+                            </div>
+                            <div>
+                                <h4 class="font-robot font-semibold text-sm flex items-center gap-1.5 text-ink">
+                                    Amit <i class="fa-solid fa-circle-check text-clay text-xs"></i>
+                                </h4>
+                                <div class="text-gold text-xs flex gap-0.5 mt-0.5">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[#5C594E] leading-relaxed ">
+                            "Absolutely stellar experience. Highly nourishing texture, nice mild rose fragrance. Skin looks distinctly refreshed and smoother within a week."
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <button id="prevBtn" class="absolute left-[-1.5rem] md:left-[-3rem] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-ink text-parchment hover:bg-ink-light rounded-full flex items-center justify-center shadow-lg transition z-10">
+                <i class="fa-solid fa-chevron-left text-sm md:text-base"></i>
+            </button>
+
+            <button id="nextBtn" class="absolute right-[-1.5rem] md:right-[-3rem] top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-ink text-parchment hover:bg-ink-light rounded-full flex items-center justify-center shadow-lg transition z-10">
+                <i class="fa-solid fa-chevron-right text-sm md:text-base"></i>
+            </button>
+        </div>
+
+        <div class="flex justify-center gap-2 mt-8">
+            <button class="dot w-2.5 h-2.5 rounded-full bg-clay transition-all duration-300"></button>
+            <button class="dot w-2.5 h-2.5 rounded-full bg-[#DCD3BA] transition-all duration-300"></button>
+            <button class="dot w-2.5 h-2.5 rounded-full bg-[#DCD3BA] transition-all duration-300"></button>
+        </div>
+    </section>
+
+
+
+    <!-- ============ FAQ ============ -->
+    <section class="max-w-4xl mx-auto px-4 py-6 md:py-16">
+        <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2 text-center">Good to Know</p>
+        <h2 class="text-3xl font-robot  font-medium text-ink mb-10 text-center">FAQs</h2>
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-[#ECE4CE] divide-y divide-[#ECE4CE]">
+            <details class="group p-5" open>
+                <summary class="flex justify-between items-center font-robot font-medium cursor-pointer list-none text-ink">
+                    <span>Can I use face wash daily?</span>
+                    <span class="transition group-open:rotate-45 text-clay"><i class="fa-solid fa-plus text-sm"></i></span>
+                </summary>
+                <p class="text-sm text-ash mt-3 pl-2 border-l-2 border-clay leading-relaxed">Yes, you can use face wash twice a day safely.</p>
+            </details>
+            <details class="group p-5">
+                <summary class="flex justify-between items-center font-robot font-medium cursor-pointer list-none text-ink">
+                    <span>Can a 17 year-old use a face wash?</span>
+                    <span class="transition group-open:rotate-45 text-clay"><i class="fa-solid fa-plus text-sm"></i></span>
+                </summary>
+                <p class="text-sm text-ash mt-3 pl-2 border-l-2 border-clay leading-relaxed">Yes, our natural ingredient blends are gentle and perfectly fine for teenage skin types.</p>
+            </details>
+            <details class="group p-5">
+                <summary class="flex justify-between items-center font-robot font-medium cursor-pointer list-none text-ink">
+                    <span>Can men use face wash daily?</span>
+                    <span class="transition group-open:rotate-45 text-clay"><i class="fa-solid fa-plus text-sm"></i></span>
+                </summary>
+                <p class="text-sm text-ash mt-3 pl-2 border-l-2 border-clay leading-relaxed">Absolutely, it thoroughly helps clear out daily pollution, dust, and excess sebum tracking.</p>
+            </details>
+            <details class="group p-5">
+                <summary class="flex justify-between items-center font-robot font-medium cursor-pointer list-none text-ink">
+                    <span>How do you use Rose face wash?</span>
+                    <span class="transition group-open:rotate-45 text-clay"><i class="fa-solid fa-plus text-sm"></i></span>
+                </summary>
+                <p class="text-sm text-ash mt-3 pl-2 border-l-2 border-clay leading-relaxed">Apply a dime-sized amount on wet face, gently massage in circular patterns, then rinse clean with lukewarm water.</p>
+            </details>
+        </div>
+    </section>
+
+ 
+    <!-- ============ FOOTER ============ -->
+  <div id="footer-placeholder"></div>
+
+  <!-- ============Popup Form to New Lead============ -->
+   <div id="lead-modal-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="./js/include.js"></script>
+    <!-- main.js is a module (it uses `import BASE_URL from "./config.js"`),
+         so it must ONLY be loaded once, with type="module".
+         Loading it a second time as a classic script previously broke
+         everything: the import syntax threw a fatal error in that copy,
+         and even the working module copy doesn't expose its functions
+         to window on its own (module scope != global scope) — that's
+         why quantity +/- and the product carousel buttons stopped
+         responding. main.js now explicitly attaches those functions
+         to window itself, so this single tag is all that's needed. -->
+    <script type="module" src="./js/main.js"></script>
+    <script src="./js/cart.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/lead.js"></script>
+    <script>
+        // Modal ko background me dynamically pull karne ke liye script
+        fetch('./lead.html')
+            .then(response => response.text())
+            .then(htmlContent => {
+                document.getElementById('lead-modal-container').innerHTML = htmlContent;
+            })
+            .catch(err => console.error('Lead modal load failed:', err));
+    </script>
+</body>
+</html>

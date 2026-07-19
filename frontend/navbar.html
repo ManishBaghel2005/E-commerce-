@@ -1,0 +1,59 @@
+
+<!-- ============ NAV ============ -->
+<nav class="bg-white text-parchment sticky top-0 z-50 border-b border-gold/20">
+    <div class="max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center">
+
+        <div class="flex items-center">
+            <button id="menu-btn" class="md:hidden text-xl text-[#2A2A24] focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="hidden md:flex items-center gap-7 text-[13px] font-medium tracking-wide uppercase text-black/85">
+                <ul class="flex gap-6">
+                    <li><a href="./index.html" class="hover:text-gold transition">Home</a></li>
+                    <li><a href="./moreproduct.html" class="hover:text-gold transition">Shop</a></li>
+                    <li><a href="./Blog.html">Blogs</a></li>
+                    <li><a href="./aboutus.html">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flex justify-center items-center p-2">
+            <span class="h-[40px] md:h-[50px] flex items-center">
+                <img src="./static/logo2.png" alt="logo" class="w-[140px] md:w-[170px] h-fit object-contain">
+            </span>
+        </div>
+
+       <div id="nav-auth-container" class="flex items-center justify-end gap-5 normal-case">
+    <button id="search-open-btn" class="transition p-1 text-base text-black focus:outline-none hover:text-gold">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+
+    <div id="search-container" class="search-hidden">
+        <input type="text" placeholder="Search Here....." id="search-input" class="text-black">
+        <button id="search-close-btn">&times;</button>
+    </div>
+
+    <a href="./cart.html" class="relative text-base text-black hover:text-gold transition">
+        <i class="fa-solid fa-shopping-cart"></i>
+        <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white">0</span>
+    </a>
+
+   <div id="auth-actions" class="flex items-center gap-4">
+    <a href="./login.html" class="text-base text-black hover:text-gold transition">
+        <i class="fa-solid fa-user"></i>
+    </a>
+</div>
+</div>
+
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gold/10 px-4 py-4 text-sm font-medium uppercase tracking-wide text-black/85">
+        <ul class="flex flex-col gap-4">
+            <li><a href="./index.html" class="block hover:text-gold transition py-1">Home</a></li>
+            <li><a href="./moreproduct.html" class="block hover:text-gold transition py-1">Shop</a></li>
+            <li><a href="./Blog.html">Blogs</a></li>
+            <li><a href="./aboutus.html">About Us</a></li>
+        </ul>
+    </div>
+</nav>

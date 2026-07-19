@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - User show</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body class="font-['Manrope'] bg-gray-50 flex flex-col h-screen">
+
+    <!-- Top Navigation Bar -->
+    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0">
+        <h1 class="text-xl font-bold">Hello Admin</h1>
+    </nav>
+    
+    <!-- Main Wrapper (Sidebar + Content) -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
+            <nav class="w-full">
+                <ul class="space-y-2">
+                    
+                    <li>
+                        <a href="./adminproduct.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition">
+                            <i class="fa-solid fa-box"></i> Product
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminleadshow.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium">
+                            <i class="fa-solid fa-compass"></i> Lead Show
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminUserquery.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium">
+                            <i class="fa-solid fa-compass"></i> User Query
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-8 overflow-y-auto w-full space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-stone-50 border-b border-gray-100 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                <th class="py-4 px-6">User Name</th>
+                                <th class="py-4 px-6">Contact Info</th>
+                                <th class="py-4 px-6">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body" class="divide-y divide-gray-100 text-sm text-gray-700">
+                            <!-- Dynamic data javascript se yahan insert hoga -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Empty State Loader/No Data Message -->
+                <div id="empty-state" class="hidden p-12 text-center">
+                    <i class="fa-solid fa-box-open text-gray-300 text-4xl mb-3"></i>
+                    <h4 class="font-medium text-gray-600">Abhi koi lead data nahi hai</h4>
+                </div>
+
+                <!-- Modern Pagination Controls (Bootstrap styled inside Tailwind) -->
+                <div id="pagination-wrapper" class="flex items-center justify-between border-t border-gray-100 px-6 py-4 bg-gray-50/50">
+                    <span class="text-xs text-gray-500" id="pagination-status">Showing 0 to 0 of 0 entries</span>
+                    <nav aria-label="Page navigation">
+                        <ul id="pagination-container" class="inline-flex -space-x-px text-xs font-medium bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                            <!-- Dynamic page links yahan insert honge -->
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JS Script Connection -->
+    <script type="module" src="./js/adminUserquery.js"></script>
+   
+</body>
+</html>

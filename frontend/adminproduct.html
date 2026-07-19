@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Product Management</title>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body class="font-['Manrope'] bg-gray-50 flex flex-col h-screen">
+
+    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0">
+        <h1 class="text-xl font-bold">Hello Admin</h1>
+    </nav>
+    <div class="flex flex-1 overflow-hidden">
+        
+        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
+            <nav class="w-full">
+                <ul class="space-y-2">
+                    
+                    <li>
+                        <a href="./adminproduct.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium">
+                            <i class="fa-solid fa-box"></i> Product
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminleadshow.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition">
+                            <i class="fa-solid fa-compass"></i> Lead Show
+                        </a>
+                    </li>
+                     <li>
+                        <a href="./adminUserquery.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium">
+                            <i class="fa-solid fa-compass"></i> User Query
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+       <main class="flex-1 p-8 overflow-y-auto w-full space-y-6">
+            
+            <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800">Product Section</h2>
+                <a href="./addnewproduct.html" class="bg-[#a35242] hover:bg-[#8c4335] text-white px-4 py-2 rounded-xl text-sm font-medium uppercase tracking-wider shadow-sm transition duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Add New Product
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">All Registered Products</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left text-sm text-gray-500">
+                        <thead class="bg-gray-50 text-xs font-semibold text-gray-700 uppercase tracking-wider border-b">
+                           <tr>
+                            <th class="px-6 py-3">Product</th>
+                            <th class="px-6 py-3">Available Volumes</th>
+                            <th class="px-6 py-3">Starting Price</th>
+                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3">Rating</th>
+                            <th class="px-6 py-3">Actions</th> 
+                           </tr>
+                        </thead>
+                        <tbody id="productTableBody" class="divide-y divide-gray-100 border-t border-gray-100">
+                            <tr>
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-400">Loading products from database...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="productModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-xl mx-4 p-6 shadow-xl relative transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+            
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-gray-900 border-b pb-3 mb-4">📦 Full Product Profile</h3>
+            
+            <div class="space-y-4">
+                <div class="flex justify-center bg-gray-50 p-4 rounded-xl border border-gray-100 relative">
+                    <img id="modalImg" src="" alt="" class="h-40 w-40 object-cover rounded-xl shadow-sm border">
+                    <span id="modalBadge" class="absolute top-4 right-4 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow-sm"></span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400 block">Product Name</span>
+                        <p id="modalName" class="text-base font-bold text-gray-800 mt-0.5"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400 block">Product Description</span>
+                    <p id="modalDesc" class="text-sm text-gray-600 mt-1 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed"></p>
+                </div>
+
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-gray-400 block mb-2">Sizes, Pricing & Inventory Details</span>
+                    <div class="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-xs bg-white">
+                            <thead class="bg-gray-50 font-bold text-gray-600 uppercase border-b border-gray-100">
+                                <tr>
+                                    <th class="px-4 py-2">Volume</th>
+                                    <th class="px-4 py-2">Offer Price</th>
+                                    <th class="px-4 py-2">MRP Price</th>
+                                    <th class="px-4 py-2">Stock Available</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalVariantsBody" class="divide-y divide-gray-50">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center bg-amber-50/50 border border-amber-100 p-3 rounded-xl">
+                    <div class="flex items-center gap-1.5 text-amber-600">
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <span id="modalRating" class="text-sm font-bold text-gray-800"></span>
+                    </div>
+                    <span id="modalReviews" class="text-xs text-gray-500 font-medium"></span>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t pt-4 flex justify-end">
+                <button onclick="closeModal()" class="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-xl text-sm font-semibold shadow transition">
+                    Close Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+   <script type="module" src="./js/adminproduct.js"></script>
+   
+</body>
+</html>

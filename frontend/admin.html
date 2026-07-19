@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body class="font-['Manrope'] bg-gray-50 flex flex-col h-screen">
+
+    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0">
+        <h1 class="text-xl font-bold">Hello Admin</h1>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
+            <nav class="w-full">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="./adminproduct.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition">
+                            <i class="fa-solid fa-box"></i> Product
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminleadshow.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition">
+                            <i class="fa-solid fa-compass"></i> Lead Show
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminUserquery.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium">
+                            <i class="fa-solid fa-compass"></i> User Query
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- FIX: Added Elegant Logout Button at the bottom of the sidebar -->
+            <div class="pt-4 border-t border-gray-700">
+                <button id="adminLogoutBtn" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 transition font-medium text-left">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 overflow-y-auto">
+            <div class="animate__animated animate__fadeIn">
+                <h2 class="text-3xl font-bold text-gray-800">Hello Manish</h2>
+                <p class="mt-2 text-gray-600">Welcome back to your administration panel.</p>
+            </div>
+        </main>
+
+    </div>
+
+</body>
+</html>

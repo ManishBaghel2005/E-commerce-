@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alora Radiance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    ink: '#152219',
+                    'ink-light': '#1F3327',
+                    'ink-soft': '#28402F',
+                    parchment: '#F7F2E7',
+                    card: '#FFFFFF',
+                    clay: '#A24C3D',
+                    'clay-light': '#C97E63',
+                    'clay-dark': '#7E3A2F',
+                    sage: '#6C8763',
+                    'sage-light': '#E7ECDF',
+                    gold: '#BB9556',
+                    ash: '#6B685F',
+                },
+                fontFamily: {
+                   
+                    robot: ['"PT Sans"', 'ui-robot', 'Georgia', 'robot'],
+                    sans: ['"PT Sans"', 'Manrope', 'sans-serif'],
+                    roboto: ['"Roboto Mono"', 'monospace'],
+                },
+            }
+        }
+    }
+</script>
+</head>
+<body class="bg-parchment text-[#2A2A24] font-sans antialiased">
+
+    <header class="bg-white border-b border-[#ECE4CE] sticky top-0 z-50">
+
+<div id="navbar-placeholder"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="./product.html" class="flex items-center gap-2 text-ink font-serif    font-semibold text-xl tracking-tight">
+                <i class="fa-solid fa-sparkles text-gold text-base"></i>Alora radiance
+            </a>
+            <a href="./moreproduct.html" class="text-sm font-semibold text-ash hover:text-clay transition">
+                <i class="fa-solid fa-arrow-left me-1"></i> Continue Shopping
+            </a>
+        </div>
+
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12">
+        <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2">Checkout</p>
+        <h1 class="text-2xl sm:text-3xl font-serif    font-medium text-ink mb-8 flex items-center gap-3">
+            <i class="fa-solid fa-bag-shopping text-clay text-2xl"></i> Your Shopping Bag
+            <span id="cart-count-badge" class="text-xs bg-ink text-parchment px-3 py-1.5 rounded-full font-semibold tracking-wide not-   font-sans">0 Items</span>
+        </h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+            <div class="lg:col-span-2 space-y-4">
+
+                <!-- Cart items are injected here dynamically by cart.js -->
+                <div id="cart-items-list" class="space-y-4"></div>
+
+                <div id="empty-cart-state" class="hidden bg-white rounded-2xl p-14 text-center border border-[#ECE4CE] shadow-sm">
+                    <div class="w-16 h-16 bg-sage-light rounded-full flex items-center justify-center mx-auto mb-5 text-sage">
+                        <i class="fa-solid fa-basket-shopping text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-serif font-semibold text-ink mb-1">Your cart is empty</h3>
+                    <p class="text-ash text-sm mb-6">Looks like you haven't added anything to your cart yet.</p>
+                    <a href="./product.html" class="inline-flex bg-ink text-parchment px-7 py-3 rounded-md font-semibold text-sm tracking-wide hover:bg-ink-light transition">
+                        Shop Now
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                    <div class="flex items-center gap-3 bg-white p-4 rounded-xl border border-[#ECE4CE]">
+                        <div class="w-9 h-9 rounded-full bg-sage/15 text-sage flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-truck-fast text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-ink">Free Shipping</h4>
+                            <p class="text-[11px] text-ash">On all orders above ₹499</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white p-4 rounded-xl border border-[#ECE4CE]">
+                        <div class="w-9 h-9 rounded-full bg-ink/10 text-ink flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-shield-halved text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-ink">100% Secure</h4>
+                            <p class="text-[11px] text-ash">SSL Encrypted payments</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white p-4 rounded-xl border border-[#ECE4CE]">
+                        <div class="w-9 h-9 rounded-full bg-gold/15 text-gold flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-rotate-left text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-ink">Easy Returns</h4>
+                            <p class="text-[11px] text-ash">7-day window</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="summary-panel" class="space-y-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-[#ECE4CE]">
+                    <h3 class="text-xs font-bold text-ash uppercase tracking-[0.2em] mb-3">Apply Coupon</h3>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-ticket absolute left-3 top-1/2 -translate-y-1/2 text-ash text-xs"></i>
+                            <input type="text" id="coupon-input" placeholder="Enter coupon code" class="w-full pl-9 pr-3 py-2 border border-[#DCD3BA] rounded-xl text-sm uppercase tracking-wider font-semibold text-ink focus:outline-none focus:border-clay">
+                        </div>
+                        <button onclick="applyCoupon()" class="bg-ink text-parchment px-4 py-2 rounded-xl text-sm font-semibold hover:bg-ink-light transition">Apply</button>
+                    </div>
+                    <p id="coupon-message" class="text-xs font-medium mt-2 hidden"></p>
+
+                    <div class="mt-4 pt-3 border-t border-dashed border-[#E3D9BC]">
+                        <p class="text-[11px] text-ash font-semibold uppercase tracking-wider mb-2">Available Coupons</p>
+                        <button onclick="autoFillCoupon('GLOW10')" class="w-full flex justify-between items-center bg-gold/10 hover:bg-gold/15 border border-gold/30 p-2.5 rounded-xl transition group">
+                            <span>
+                                <span class="block text-xs font-bold text-clay-dark font-mono">GLOW10</span>
+                                <span class="block text-[10px] text-ash">Get 10% off on your total order</span>
+                            </span>
+                            <i class="fa-solid fa-circle-plus text-gold group-hover:text-clay transition text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-[#ECE4CE]">
+                    <h2 class="text-sm font-bold text-ink uppercase tracking-wider mb-4 border-b border-[#ECE4CE] pb-3">Bill Details</h2>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between text-ash">
+                            <span>Bag Subtotal</span>
+                            <span id="bill-subtotal" class="font-semibold text-ink">₹ 0</span>
+                        </div>
+
+                        <div id="discount-row" class="flex justify-between text-sage hidden">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-tag"></i> Coupon Discount (<span id="applied-coupon-name"></span>)</span>
+                            <span class="font-semibold">- ₹ <span id="bill-discount">0</span></span>
+                        </div>
+
+                        <div class="flex justify-between text-ash">
+                            <span>Delivery Charges</span>
+                            <span id="bill-delivery" class="font-semibold text-ink">₹ 40</span>
+                        </div>
+
+                        <div id="shipping-alert" class="bg-sage-light border border-sage/30 text-ink text-xs p-3 rounded-xl flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-sage"></i>
+                            <span>Add <span id="shipping-needed" class="font-bold">₹ 199</span> more for <span class="font-bold">FREE Delivery</span>!</span>
+                        </div>
+
+                        <hr class="border-[#ECE4CE] my-4">
+                        <div class="gap-4 flex items-center">
+                            <input type="checkbox" name="" class="w-7 h-7 cursor-pointer" id="founder-delivery">
+                            <label for="" class="text-[red] text-base">Hand-Delivered by the Founder in Delhi NCR  ₹5,000 Service Charge </label>
+                        </div>
+
+                        <div class="flex justify-between items-baseline">
+                            <span class="text-base font-serif font-semibold text-ink">Total Payable</span>
+                            <span id="bill-total" class="text-2xl font-serif font-semibold text-clay">₹ 0</span>
+                        </div>
+                    </div>
+
+                    <button id="payNow" class="w-full bg-clay text-white py-3.5 rounded-xl font-semibold text-sm tracking-[0.15em] uppercase shadow-sm hover:bg-clay-dark transition mt-6 flex items-center justify-center gap-2">
+                        Pay Now <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="./js/include.js"></script>
+    <script src="./js/payment.js"></script>
+    <script type="module" src="./js/payment.js"></script>
+    <script src="./js/cart.js"></script>
+    <script src="./js/app.js"></script>
+   <script type="module" src="./js/contacts.js"></script>
+</body>
+</html>

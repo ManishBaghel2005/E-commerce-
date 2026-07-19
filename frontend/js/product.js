@@ -1,0 +1,203 @@
+import BASE_URL from "./config.js";
+
+// Global variables current selection store karne ke liye
+let currentProductData = null;
+let currentSelectedVariant = null;
+
+// Unified Cart Storage Key
+const PRIMARY_CART_KEY = "glowRitualCartData";
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initial Product Data Load Karein
+    loadProductDetails();
+
+    // 2. Add To Cart Button Par Modern Event Listener Lagayein
+    const cartBtn = document.getElementById('cart-toggle-btn');
+    if (cartBtn) {
+        cartBtn.addEventListener('click', (e) => {
+            handleCartButtonClick(e.currentTarget);
+        });
+    }
+
+    // 3. Quantity Buttons Par Event Listeners Lagayein
+    const qtyMinusBtn = document.getElementById('qty-minus');
+    const qtyPlusBtn = document.getElementById('qty-plus');
+    
+    if (qtyMinusBtn) qtyMinusBtn.addEventListener('click', () => updateQty(-1));
+    if (qtyPlusBtn) qtyPlusBtn.addEventListener('click', () => updateQty(1));
+});
+
+async function loadProductDetails() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    if (!productId) {
+        console.error("Product ID URL mein nahi mili.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/product/${productId}`);
+        const product = await response.json();
+
+        if (!response.ok) throw new Error(product.error || "Product fetch nahi ho paya");
+
+        // Global state update
+        currentProductData = product; 
+        console.log("Fetched Product Data:", product);
+
+        // --- UI Updates ---
+        const mainImg = document.getElementById('main-product-image');
+        if (mainImg) {
+            mainImg.src = product.imagepath ? `${BASE_URL}${product.imagepath}` : "./static/placeholder.png";
+            mainImg.alt = product.name || "Product Image";
+        }
+
+        const titleEl = document.getElementById('product-title');
+        if (titleEl) titleEl.innerText = product.name || "No Title Available";
+
+        const descEl = document.getElementById('product-desc');
+        if (descEl) descEl.innerText = product.description || 'No description available.';
+
+        // Details & Ingredients Tabs update
+        const detailsEl = document.getElementById('product-details');
+        if (detailsEl) detailsEl.innerText = product.details || product.description || "Details not available.";
+
+        const ingredientsEl = document.getElementById('product-ingredients');
+        if (ingredientsEl) ingredientsEl.innerText = product.ingredients || "Ingredients info not specified.";
+
+        // Ratings Logic
+        const ratingCount = Math.round(product.rating || 4);
+        const starsContainer = document.querySelector('.text-gold.text-sm');
+        if (starsContainer) {
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHTML += i <= ratingCount ? `<i class="fa-solid fa-star"></i>` : `<i class="fa-regular fa-star text-[#D9D2BC]"></i>`;
+            }
+            starsContainer.innerHTML = starsHTML;
+        }
+
+        // --- Variants & Price Dynamic Configuration ---
+        const priceEl = document.getElementById('product-price');
+        const mrpEl = document.getElementById('product-mrp');
+        const variantsContainer = document.getElementById('variants-container');
+
+        if (product.variants && product.variants.length > 0) {
+            // Default select first variant
+            currentSelectedVariant = product.variants[0];
+            if (priceEl) priceEl.innerText = `₹ ${currentSelectedVariant.price}`;
+            if (mrpEl) mrpEl.innerText = currentSelectedVariant.comparePrice ? `₹ ${currentSelectedVariant.comparePrice}` : '';
+
+            if (variantsContainer) {
+                variantsContainer.innerHTML = product.variants.map((v, index) => {
+                    const isActive = index === 0;
+                    const activeClasses = isActive 
+                        ? 'border-2 border-ink bg-ink text-parchment font-semibold' 
+                        : 'border border-[#DCD3BA] text-ash font-semibold hover:border-ink';
+
+                    return `
+                        <button 
+                            onclick="selectSize('${v.volume}', ${v.price}, ${v.comparePrice || 0}, this)" 
+                            class="size-btn text-sm px-4 py-2 rounded-full transition ${activeClasses}"
+                        >
+                            ${v.volume}
+                        </button>
+                    `;
+                }).join('');
+            }
+        } else {
+            // No variants simple fallback mapping
+            currentSelectedVariant = {
+                volume: 'Standard',
+                price: product.price || 0,
+                comparePrice: product.comparePrice || 0
+            };
+            if (priceEl) priceEl.innerText = `₹ ${product.price || 0}`;
+            if (mrpEl) mrpEl.innerText = product.comparePrice ? `₹ ${product.comparePrice}` : '';
+            if (variantsContainer) variantsContainer.innerHTML = `<p class="text-xs text-ash">No variants available</p>`;
+        }
+
+    } catch (error) {
+        console.error("Error loading product details:", error);
+    }
+}
+
+// Global scope window access attachment for inline dynamic variant buttons
+window.selectSize = function(volume, price, comparePrice, buttonElement) {
+    if (!buttonElement) return;
+
+    document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.className = "size-btn text-sm px-4 py-2 rounded-full transition border border-[#DCD3BA] text-ash font-semibold hover:border-ink";
+    });
+    buttonElement.className = "size-btn text-sm px-4 py-2 rounded-full transition border-2 border-ink bg-ink text-parchment font-semibold";
+
+    currentSelectedVariant = { volume, price, comparePrice };
+
+    const priceEl = document.getElementById('product-price');
+    const mrpEl = document.getElementById('product-mrp');
+    if (priceEl) priceEl.innerText = `₹ ${price}`;
+    if (mrpEl) mrpEl.innerText = comparePrice ? `₹ ${comparePrice}` : '';
+}
+
+function handleCartButtonClick(btnElement) {
+    if (!currentProductData || !currentSelectedVariant) {
+        alert("Product load hone ka intezar karein.");
+        return;
+    }
+
+    const qtyInput = document.getElementById('quantity');
+    const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+    let cart = JSON.parse(localStorage.getItem(PRIMARY_CART_KEY)) || [];
+
+    const productId = currentProductData._id || currentProductData.id;
+    const targetVolumeText = currentSelectedVariant.volume || "Standard";
+    const compositeCartUniqueIdKeyString = `${productId}_${targetVolumeText}`;
+
+    const targetProductImageSrc = currentProductData.imagepath ? `${BASE_URL}${currentProductData.imagepath}` : "./static/placeholder.png";
+
+    const existingItem = cart.find(item => item.uniqueCartItemKeyId === compositeCartUniqueIdKeyString);
+
+    if (existingItem) {
+        existingItem.qtyCountOrderMetric += quantity;
+    } else {
+        cart.push({
+            uniqueCartItemKeyId: compositeCartUniqueIdKeyString,
+            productId: productId,
+            productName: currentProductData.name,
+            productDescription: currentProductData.description || 'No description available',
+            activeSelectedSizeConfig: targetVolumeText,
+            unitPriceItemConfig: parseInt(currentSelectedVariant.price) || 0,
+            qtyCountOrderMetric: quantity,
+            baseImg: targetProductImageSrc
+        });
+    }
+
+    localStorage.setItem(PRIMARY_CART_KEY, JSON.stringify(cart));
+    console.log("Cart localstorage successfully synchronized:", cart);
+    
+    if (typeof window.updateHeaderCartCount === 'function') {
+        window.updateHeaderCartCount();
+    }
+    
+    // UI Feedback state logic
+    const originalText = btnElement.innerHTML;
+    btnElement.innerHTML = `<i class="fa-solid fa-circle-check"></i> Added!`;
+    btnElement.disabled = true;
+    
+    setTimeout(() => {
+        btnElement.innerHTML = originalText;
+        btnElement.disabled = false;
+        if (qtyInput) qtyInput.value = 1;
+        window.location.href = "./cart.html";
+    }, 1200);
+}
+
+function updateQty(change) {
+    const qtyInput = document.getElementById('quantity');
+    if (!qtyInput) return;
+    let currentQty = parseInt(qtyInput.value) || 1;
+    currentQty += change;
+    if (currentQty < 1) currentQty = 1;
+    qtyInput.value = currentQty;
+}

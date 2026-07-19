@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alora Radiance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#152219',
+                        'ink-light': '#1F3327',
+                        'ink-soft': '#28402F',
+                        parchment: '#F7F2E7',
+                        card: '#FFFFFF',
+                        clay: '#A24C3D',
+                        'clay-light': '#C97E63',
+                        'clay-dark': '#7E3A2F',
+                        sage: '#6C8763',
+                        'sage-light': '#E7ECDF',
+                        gold: '#BB9556',
+                        ash: '#6B685F',
+                    },
+                    fontFamily: {
+                        robot: ['"PT Sans"', 'ui-robot', 'Georgia', 'robot'],
+                        sans: ['"PT Sans"', 'Manrope', 'sans-serif'],
+                        roboto: ['"Roboto Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-parchment text-[#2A2A24] antialiased font-sans">
+
+    <!-- ============ NAV placeholder ============ -->
+    <div id="navbar-placeholder"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <nav class="flex text-sm text-ash gap-2">
+            <a href="./index.html" class="hover:text-clay transition">Home</a>
+            <span>/</span>
+            <span class="text-ink font-medium">Product</span>
+        </nav>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-[#ECE4CE]">
+
+            <!-- Left Image Container Section -->
+            <div class="flex flex-col gap-4">
+                <div class="imagesection bg-white rounded-2xl flex justify-center items-center h-[400px] overflow-hidden border border-[#E7DFC7]">
+                    <img id="main-product-image" src="" alt="Loading..." class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105">
+                </div>
+                <div id="thumbnails-container" class="flex gap-3 justify-center"></div>
+            </div>
+
+            <!-- Right Variant & Purchase Info Details Section -->
+            <div class="flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="bg-sage/15 text-sage text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Best Seller</span>
+                        <span class="bg-gold/15 text-clay-dark text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">100% Vegan</span>
+                    </div>
+                    <h1 id="product-title" class="text-2xl sm:text-3xl font-robot font-medium text-ink mb-3">Loading Product...</h1>
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex text-gold text-sm"></div>
+                        <span class="text-xs text-ash font-medium">(4.0 / 5.0 out of 142 ratings)</span>
+                    </div>
+
+                    <div class="mb-6 flex items-baseline gap-3">
+                        <span id="product-price" class="text-3xl font-serif font-semibold text-ink">₹ 0</span>
+                        <span id="product-mrp" class="text-sm text-ash line-through"></span>
+                    </div>
+
+                    <hr class="border-[#ECE4CE] my-6">
+
+                    <p id="product-desc" class="text-[#5C594E] text-sm leading-relaxed mb-6">
+                        Loading description...
+                    </p>
+
+                    <div class="mb-6">
+                        <h3 class="text-xs font-bold text-ash uppercase tracking-wider mb-3">Select Size</h3>
+                        <div id="variants-container" class="flex gap-3"></div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-xs font-bold text-ash uppercase tracking-wider mb-3">Quantity</h3>
+                        <div class="flex items-center border border-[#DCD3BA] w-32 rounded-lg overflow-hidden bg-white">
+                            <button id="qty-minus" class="w-10 h-10 bg-[#FAF7EE] text-ink hover:bg-[#F1EBD7] font-bold transition flex items-center justify-center select-none">−</button>
+                            <input type="number" id="quantity" value="1" min="1" readonly class="w-12 h-10 text-center font-semibold text-ink focus:outline-none text-sm">
+                            <button id="qty-plus" class="w-10 h-10 bg-[#FAF7EE] text-ink hover:bg-[#F1EBD7] font-bold transition flex items-center justify-center select-none">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="cart-toggle-btn" class="w-[250px] bg-clay hover:bg-clay-dark text-white py-3 font-semibold text-xs tracking-[0.15em] uppercase transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
+                    </button>
+                    <button class="flex-1 bg-ink text-parchment py-3.5 rounded-xl font-semibold text-sm tracking-[0.1em] uppercase shadow-sm hover:bg-ink-light transition">
+                        Buy It Now
+                    </button>
+                </div>
+
+                <div class="mt-8 border-t border-[#ECE4CE] pt-4">
+                    <details class="group py-3" open>
+                        <summary class="flex justify-between items-center font-serif font-semibold text-sm text-ink cursor-pointer list-none">
+                            <span>Product Details &amp; Benefits</span>
+                            <span class="transition group-open:rotate-45 text-clay"><i class="fa-solid fa-plus text-xs"></i></span>
+                        </summary>
+                        <p id="product-details" class="text-xs text-ash mt-2 leading-relaxed">
+                            Loading...
+                        </p>
+                    </details>
+                    <details class="group py-3 border-t border-[#ECE4CE]">
+                        <summary class="flex justify-between items-center font-serif font-semibold text-sm text-ink cursor-pointer list-none">
+                            <span>Key Ingredients</span>
+                            <span class="transition group-open:rotate-45 text-clay"><i class="fa-solid fa-plus text-xs"></i></span>
+                        </summary>
+                        <p id="product-ingredients" class="text-xs text-ash mt-2 leading-relaxed font-mono">
+                            Loading...
+                        </p>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ============ FOOTER & MODALS ============ -->
+    <div id="footer-placeholder"></div>
+    <div id="lead-modal-container"></div>
+
+    <!-- Script Load Order Sequence -->
+    <script src="./js/include.js"></script>
+    <script type="module" src="./js/product.js"></script>
+    <script src="./js/cart.js"></script>
+    <script src="./js/app.js"></script>
+    <script type="module" src="./js/contacts.js"></script>
+    <script type="module" src="./js/lead.js"></script>
+
+    <script>
+        fetch('./lead.html')
+            .then(response => response.text())
+            .then(htmlContent => {
+                document.getElementById('lead-modal-container').innerHTML = htmlContent;
+            })
+            .catch(err => console.error("Error loading lead modal:", err));
+    </script>
+
+</body>
+</html>
