@@ -39,7 +39,7 @@ router.post("/add",upload.single('imagepath'),addnewproduct)
 router.get("/all",readproduct)
 router.put("/update/:id",upload.single('imagepath'),updateproduct)
 router.delete("/delete/:id",deleteproduct)
-router.get("/:id", getproductbyid)  
 router.get('/search', searchProducts);
+router.get("/:id", getproductbyid)  
 
 export default router

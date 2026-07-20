@@ -8,6 +8,7 @@ import queryRoutes from "./routes/query.routes.js";
 import leadRoutes from "./routes/lead.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import blogRoutes from "./routes/blog.routes.js"; 
+import reviewRoutes from "./routes/review.routes.js";
 import dotenv from "dotenv";
 import dns from "dns";
 import path from "path";
@@ -55,6 +56,7 @@ app.use('/api/queries', queryRoutes);
 app.use('/api/lead', leadRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use('/api/blogs', blogRoutes); 
+app.use('/api/reviews', reviewRoutes);
 
 // Database connection & Server Boot
 const Port = process.env.PORT || 5000;

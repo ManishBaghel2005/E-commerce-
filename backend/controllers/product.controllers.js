@@ -151,17 +151,21 @@ export const searchProducts = async (req, res) => {
       return res.status(200).json({ success: true, products: [] });
     }
 
-    // Case-insensitive search using Regex
-    const products = await Product.find({
+    // 🔴 Debugging log lagayein taaki terminal me query dikhe
+    console.log("Searching for query:", q); 
+
+    const products = await SimpleProduct.find({
       $or: [
         { name: { $regex: q, $options: 'i' } },
         { title: { $regex: q, $options: 'i' } },
         { description: { $regex: q, $options: 'i' } }
       ]
-    }).limit(6); // Limit results for clean UI suggestions
+    }).limit(6);
 
     res.status(200).json({ success: true, products });
   } catch (error) {
+    // 🔴 Is line ko dhyan se console.error karein taaki exact galti terminal me dikhe
+    console.error("Backend Search Error Detail:", error); 
     res.status(500).json({ success: false, message: error.message });
   }
 };

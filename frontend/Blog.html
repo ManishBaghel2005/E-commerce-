@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alora Radiance | Blog</title>
+    
+    <!-- 🔴 Dynamic Hooks for SEO Elements -->
+    <title id="dynamic-title">Alora Radiance | Blog</title>
+    <meta id="dynamic-meta-desc" name="description" content="Explore stories, tutorials, and structured learning modules instantly.">
+    <meta id="dynamic-keywords" name="keywords" content="blog, learning, tutorials">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
@@ -46,10 +51,9 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
         <div class="mb-10 animate__animated animate__fadeIn">
             <h1 class="text-3xl font-fraunces font-bold text-ink-light mb-2">Our Latest Blogs</h1>
-            <!-- <p class="text-ash text-sm">Explore stories, tutorials, and structured learning modules instantly.</p> -->
         </div>
 
-        <!-- Yahan par standard structured cards automatic render honge -->
+        <!-- Grid Container -->
         <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Cards dynamic JavaScript code se inject honge -->
         </div>
@@ -58,8 +62,7 @@
     <div id="footer-placeholder"></div>
 
     <script src="./js/include.js"></script>
-    <!-- Alag external JS file connection link -->
-
-<script type="module" src="./js/blog.js"></script>
+      <script type="module" src="./js/navbar-interactions.js"></script>
+    <script type="module" src="./js/blog.js"></script>
 </body>
 </html>

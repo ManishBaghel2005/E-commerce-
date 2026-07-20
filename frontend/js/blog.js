@@ -1,7 +1,5 @@
-// 1. Apni config file se BASE_URL import karein
 import BASE_URL from './config.js'; 
 
-// Function to automatically fetch and append elements into structural grid container from backend
 async function renderBlogCards() {
     const container = document.getElementById('blog-posts-grid');
     if (!container) return;
@@ -14,27 +12,45 @@ async function renderBlogCards() {
     `; 
 
     try {
-        // 2. Fetch data from config's BASE_URL API
         const response = await fetch(`${BASE_URL}/api/blogs/all`);
         const result = await response.json();
 
         if (result.success && result.data.length > 0) {
-            container.innerHTML = ""; // Clear loader screen
+            container.innerHTML = ""; // Clear loader
 
+            // 🔴 OPTIONAL: Agar aap sabse latest blog ka schema/meta title pure blog list page par dikhana chahte hain:
+            const latestPost = result.data[0]; 
+            if (latestPost) {
+                // Head Elements Update
+                document.getElementById('dynamic-title').innerText = `Alora Radiance Blogs | Latest: ${latestPost.metaTitle || latestPost.title}`;
+                document.getElementById('dynamic-meta-desc')?.setAttribute('content', latestPost.metaDesc || '');
+                document.getElementById('dynamic-keywords')?.setAttribute('content', latestPost.keywords || '');
+
+                // Schema Injection (Purane script ko remove karke naya lagana taaki duplicate na ho)
+                const oldSchema = document.getElementById('dynamic-json-ld');
+                if (oldSchema) oldSchema.remove();
+
+                if (latestPost.schema) {
+                    const scriptTag = document.createElement('script');
+                    scriptTag.id = 'dynamic-json-ld';
+                    scriptTag.type = 'application/ld+json';
+                    scriptTag.text = typeof latestPost.schema === 'string' ? latestPost.schema : JSON.stringify(latestPost.schema);
+                    document.head.appendChild(scriptTag);
+                }
+            }
+
+            // Cards loop rendering as usual
             result.data.forEach(post => {
-                // 3. Format ISO Date String to reader friendly format (e.g., "Jul 17, 2026")
                 const formattedDate = new Date(post.createdAt).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric'
                 });
 
-                // 4. Handle Cover Image Paths (Check if it's an external link or a local upload)
                 const absoluteCoverImage = post.coverImage.startsWith('http') 
                     ? post.coverImage 
                     : `${BASE_URL}${post.coverImage}`;
 
-                // 5. Inject Tailwind card component
                 const cardHTML = `
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200/80 flex flex-col cursor-pointer transition transform hover:-translate-y-1 duration-300" onclick="goToPost('${post.slug}')">
                         <div class="w-full aspect-[16/10] overflow-hidden bg-gray-100">
@@ -84,13 +100,9 @@ async function renderBlogCards() {
     }
 }
 
-// Redirect using URL params
 function goToPost(slug) {
     window.location.href = `./post.html?slug=${slug}`;
 }
 
-// Global scope me expose kiya taaki inline HTML onclick isse read kar sake
 window.goToPost = goToPost;
-
-// Load standard initialization grid
 document.addEventListener('DOMContentLoaded', renderBlogCards);

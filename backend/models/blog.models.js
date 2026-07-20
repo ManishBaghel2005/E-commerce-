@@ -1,13 +1,48 @@
 import mongoose from 'mongoose';
 
 const blogSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    content: { type: String, required: true }, // Stores raw HTML from Quill Text Editor
-    metaTitle: { type: String },
-    category: { type: String, required: true },
-    metaDesc: { type: String },
-    coverImage: { type: String }
+    title: { 
+        type: String, 
+        required: true,
+        trim: true 
+    },
+    slug: { 
+        type: String, 
+        required: true, 
+        unique: true,
+        trim: true 
+    },
+    content: { 
+        type: String, 
+        required: true 
+    }, // Quill Text Editor ka raw HTML ya delta string store karega
+    metaTitle: { 
+        type: String,
+        trim: true 
+    },
+    keywords: { 
+        type: String, // Form ke "Keywords" input ke liye field
+        trim: true 
+    },
+    category: { 
+        type: String, 
+        required: true,
+        trim: true 
+    },
+    metaDesc: { 
+        type: String,
+        trim: true 
+    },
+    schema: { 
+        type: String // Form ke "Schema (JSON-LD)" text-area string ko store karne ke liye field
+    },
+    publisher: { 
+        type: String, // Form ke "Publisher Name" input ke liye field
+        trim: true 
+    },
+    coverImage: { 
+        type: String 
+    } // File upload path ya fir external image URL dono handle karega
 }, { timestamps: true });
 
 const Blog = mongoose.model('Blog', blogSchema);

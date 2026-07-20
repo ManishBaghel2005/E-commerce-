@@ -132,6 +132,73 @@
 
             </div>
         </div>
+
+
+        <!-- ============ REVIEWS & RATINGS SECTION ============ -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12">
+    <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-[#ECE4CE]">
+        <h2 class="text-xl sm:text-2xl font-serif font-semibold text-ink mb-8">Customer Reviews & Ratings</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Left Side: Review Form -->
+            <div class="md:col-span-1 border-b md:border-b-0 md:border-r border-[#ECE4CE] pb-6 md:pb-0 md:pr-8">
+                <h3 class="text-md font-semibold text-ink mb-4">Write a Review</h3>
+                <form id="review-form" class="space-y-4">
+                    <!-- User Name -->
+                    <div>
+                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Your Name</label>
+                        <input type="text" id="review-username" required class="w-full border border-[#DCD3BA] rounded-lg px-3 py-2 text-sm bg-parchment/30 focus:outline-none focus:border-clay">
+                    </div>
+
+                    <!-- Star Rating Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Your Rating</label>
+                        <div class="flex gap-2 text-xl text-gold" id="star-rating-selector">
+                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="1"></i>
+                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="2"></i>
+                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="3"></i>
+                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="4"></i>
+                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="review-rating-value" value="0" required>
+                    </div>
+
+                    <!-- Review Text -->
+                    <div>
+                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Review Comments</label>
+                        <textarea id="review-comment" rows="4" required class="w-full border border-[#DCD3BA] rounded-lg px-3 py-2 text-sm bg-parchment/30 focus:outline-none focus:border-clay" placeholder="Share your experience with this product..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-clay hover:bg-clay-dark text-white py-2.5 font-semibold text-xs tracking-wider uppercase transition">
+                        Submit Review
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Side: Display Submitted Reviews -->
+            <div class="md:col-span-2 space-y-6" id="reviews-list-container">
+                <h3 class="text-md font-semibold text-ink mb-4">Recent Reviews</h3>
+                
+                <!-- Dynamic Content Will Be Loaded Here via JavaScript -->
+                <div class="text-sm text-ash italic" id="no-reviews-msg">No reviews yet for this product. Be the first to share your thoughts!</div>
+                
+                <!-- Static Example Structure (JS iska content backend se fetch karega) -->
+                <!-- 
+                <div class="border-b border-[#FAF7EE] pb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-medium text-ink text-sm">Rahul Sharma</span>
+                        <span class="text-xs text-ash">20 July 2026</span>
+                    </div>
+                    <div class="flex text-gold text-xs mb-2">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>...
+                    </div>
+                    <p class="text-xs text-[#5C594E] leading-relaxed">Amazing quality product! Highly recommended.</p>
+                </div> 
+                -->
+            </div>
+        </div>
+    </div>
+</section>
     </main>
 
     <!-- ============ FOOTER & MODALS ============ -->
@@ -140,6 +207,7 @@
 
     <!-- Script Load Order Sequence -->
     <script src="./js/include.js"></script>
+      <script type="module" src="./js/navbar-interactions.js"></script>
     <script type="module" src="./js/product.js"></script>
     <script src="./js/cart.js"></script>
     <script src="./js/app.js"></script>

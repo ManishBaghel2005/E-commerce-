@@ -130,25 +130,33 @@ function initSearchFunctionality() {
 
 async function fetchSuggestions(query, suggestionsBox) {
     try {
-        const response = await fetch(`${BASE_URL}/api/products/search?q=${encodeURIComponent(query)}`);
-        const products = await response.json();
-
+        const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
+        
         if (!response.ok) throw new Error("Search API response error");
+        
+        const data = await response.json();
+        const productsList = data.products || [];
 
-        if (products.length === 0) {
+        if (productsList.length === 0) {
             suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">Koi product nahi mila "<i>${query}</i>" ke liye</div>`;
             suggestionsBox.classList.remove("hidden");
             return;
         }
 
-        suggestionsBox.innerHTML = products.map(prod => {
-            const imgUrl = prod.imagepath.startsWith("http") ? prod.imagepath : `${BASE_URL}${prod.imagepath}`;
+        suggestionsBox.innerHTML = productsList.map(prod => {
+            const imageSrc = prod.imagepath 
+                ? (prod.imagepath.startsWith("http") ? prod.imagepath : `${BASE_URL}${prod.imagepath}`)
+                : './static/placeholder.png';
+
+            // 🔥 Price validation fallback: Agar schema me key 'price' ki jagah kuch aur hai toh wo auto-pick ho jayega
+            const finalPrice = prod.price || prod.discountprice || prod.productPrice || 'N/A';
+
             return `
                 <div onclick="window.location.href='./product.html?id=${prod._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
-                    <img src="${imgUrl}" alt="${prod.name}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
+                    <img src="${imageSrc}" alt="${prod.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-black truncate text-left">${prod.name}</p>
-                        <p class="text-[11px] text-[#A0522D] font-bold text-left">₹ ${prod.price}</p>
+                        <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>
+                        <p class="text-[11px] text-[#A0522D] font-bold text-left">₹ ${finalPrice}</p>
                     </div>
                     <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
                 </div>
@@ -205,6 +213,3 @@ document.addEventListener("submit", async (e) => {
         }
     }
 });
-
-
-

@@ -7,6 +7,9 @@ let currentSelectedVariant = null;
 // Unified Cart Storage Key
 const PRIMARY_CART_KEY = "glowRitualCartData";
 
+// Review API Endpoint Configuration
+const REVIEWS_API_URL = `${BASE_URL}/api/reviews`;
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initial Product Data Load Karein
     loadProductDetails();
@@ -25,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (qtyMinusBtn) qtyMinusBtn.addEventListener('click', () => updateQty(-1));
     if (qtyPlusBtn) qtyPlusBtn.addEventListener('click', () => updateQty(1));
+
+    // 4. Reviews Feature Key Component Wireframes Initialize Karein
+    initReviewsFeature();
 });
 
 async function loadProductDetails() {
@@ -117,6 +123,9 @@ async function loadProductDetails() {
             if (variantsContainer) variantsContainer.innerHTML = `<p class="text-xs text-ash">No variants available</p>`;
         }
 
+        // Product data successfully loaded -> triggers runtime reviews fetch
+        fetchAndRenderReviews(productId);
+
     } catch (error) {
         console.error("Error loading product details:", error);
     }
@@ -200,4 +209,158 @@ function updateQty(change) {
     currentQty += change;
     if (currentQty < 1) currentQty = 1;
     qtyInput.value = currentQty;
+}
+
+// ==========================================================================
+// NEW ARCHITECTURE LAYER: REVIEWS & RATINGS LOGIC HANDLERS
+// ==========================================================================
+
+function getProductIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id') || 'alora-radiance-serum';
+}
+
+function initReviewsFeature() {
+    const starButtons = document.querySelectorAll('.star-btn');
+    const ratingInput = document.getElementById('review-rating-value');
+    const reviewForm = document.getElementById('review-form');
+
+    // 1. Interactive Dynamic Star Click Actions Setup
+    starButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const selectedValue = parseInt(button.getAttribute('data-value'));
+            if (ratingInput) ratingInput.value = selectedValue;
+
+            starButtons.forEach(star => {
+                const starValue = parseInt(star.getAttribute('data-value'));
+                if (starValue <= selectedValue) {
+                    star.classList.remove('fa-regular');
+                    star.classList.add('fa-solid');
+                } else {
+                    star.classList.remove('fa-solid');
+                    star.classList.add('fa-regular');
+                }
+            });
+        });
+    });
+
+    // 2. Submit Review Form Pipeline Handler
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const usernameInput = document.getElementById('review-username');
+            const commentInput = document.getElementById('review-comment');
+            const ratingValue = parseInt(ratingInput ? ratingInput.value : 0);
+            const productId = getProductIdFromURL();
+
+            if (ratingValue === 0) {
+                alert('Please select at least 1 star rating before submitting.');
+                return;
+            }
+
+            const reviewPayload = {
+                productId: productId,
+                username: usernameInput.value.trim(),
+                rating: ratingValue,
+                comment: commentInput.value.trim()
+            };
+
+            try {
+                const response = await fetch(REVIEWS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reviewPayload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Review submitted successfully! Thank you.');
+                    
+                    // Reset Form states back to base defaults
+                    reviewForm.reset();
+                    if (ratingInput) ratingInput.value = 0;
+                    starButtons.forEach(star => {
+                        star.classList.remove('fa-solid');
+                        star.classList.add('fa-regular');
+                    });
+
+                    // Real-time render loop invocation to sync UI immediately
+                    fetchAndRenderReviews(productId);
+                } else {
+                    alert(`Failed to save review: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error posting review payload:', error);
+                alert('Backend submission communication failure. Check your server logs.');
+            }
+        });
+    }
+}
+
+async function fetchAndRenderReviews(productId) {
+    const reviewsListContainer = document.getElementById('reviews-list-container');
+    const noReviewsMsg = document.getElementById('no-reviews-msg');
+
+    if (!reviewsListContainer) return;
+
+    try {
+        const response = await fetch(`${REVIEWS_API_URL}/${productId}`);
+        const result = await response.json();
+
+        // Safe setup: Clear existing rendered list items except the main h3 element header
+        const staticHeading = reviewsListContainer.querySelector('h3');
+        reviewsListContainer.innerHTML = '';
+        if (staticHeading) reviewsListContainer.appendChild(staticHeading);
+
+        if (result.success && result.data && result.data.length > 0) {
+            if (noReviewsMsg) noReviewsMsg.style.display = 'none';
+
+            result.data.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.className = 'border-b border-[#FAF7EE] pb-4 mb-4 last:border-0';
+
+                const reviewDate = new Date(review.createdAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHTML += i <= review.rating 
+                        ? '<i class="fa-solid fa-star mr-0.5"></i>' 
+                        : '<i class="fa-regular fa-star mr-0.5"></i>';
+                }
+
+                reviewElement.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-medium text-ink text-sm">${escapeHTML(review.username)}</span>
+                        <span class="text-xs text-ash">${reviewDate}</span>
+                    </div>
+                    <div class="flex text-gold text-xs mb-2">
+                        ${starsHTML}
+                    </div>
+                    <p class="text-xs text-[#5C594E] leading-relaxed">${escapeHTML(review.comment)}</p>
+                `;
+                reviewsListContainer.appendChild(reviewElement);
+            });
+        } else {
+            // Re-inject "No reviews yet" structure dynamically if collection array comes back empty
+            if (noReviewsMsg) {
+                reviewsListContainer.appendChild(noReviewsMsg);
+                noReviewsMsg.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching/rendering reviews dataset:', error);
+    }
+}
+
+// XSS Vulnerability injection defense helper function
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
 }

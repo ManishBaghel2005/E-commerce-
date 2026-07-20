@@ -3,19 +3,24 @@ import Blog from '../models/blog.models.js';
 // 1. Create and Publish Blog Post
 export const createBlogPost = async (req, res) => {
     try {
-        const { title, slug, content, metaTitle, category, metaDesc, coverUrl } = req.body;
+        // 🔴 Debug karne ke liye sabse pehle console.log lagayein
+        console.log("=== RECEIVED BODY ===", req.body);
+
+        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl } = req.body;
 
         if (!title || !slug || !content || !category) {
             return res.status(400).json({ success: false, message: "Required fields are missing." });
         }
 
-        // Check unique slug duplication
-        const existingBlog = await Blog.findOne({ slug });
+        // 💡 Slug formatting ko unique check se PEHLE laayein
+        const formattedSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
+
+        // Check unique slug duplication using formatted slug
+        const existingBlog = await Blog.findOne({ slug: formattedSlug });
         if (existingBlog) {
             return res.status(400).json({ success: false, message: "A post with this slug already exists." });
         }
 
-        // Image prioritization check (Uploaded file wins over text URL)
         let finalCover = coverUrl || "";
         if (req.file) {
             finalCover = `/uploads/${req.file.filename}`;
@@ -23,11 +28,14 @@ export const createBlogPost = async (req, res) => {
 
         const newBlog = new Blog({
             title,
-            slug: slug.toLowerCase().trim().replace(/ /g, '-'),
+            slug: formattedSlug, // formatted slug saved
             content,
             metaTitle,
+            keywords,     
             category,
             metaDesc,
+            schema,       
+            publisher,    
             coverImage: finalCover
         });
 
