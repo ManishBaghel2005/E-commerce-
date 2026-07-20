@@ -3,55 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO ALORA</title>
+    <title>SEO ALORA | All Posts</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght=400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 </head>
 <body class="font-['Manrope'] bg-gray-50 flex flex-col h-screen">
 
-    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0">
-        <h1 class="text-xl font-bold">Hello SEO Admin </h1>
+    <!-- Top Navigation -->
+    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0 shadow-md">
+        <h1 class="text-xl font-bold tracking-wide text-indigo-400">SEO ALORA <span class="text-white text-sm font-normal ml-2">| Admin Panel</span></h1>
     </nav>
 
+    <!-- Main Container -->
     <div class="flex flex-1 overflow-hidden">
         
-       <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
-  <nav class="w-full">
-    <ul class="space-y-2">
-      <!-- SEO Specific Links (Aap apne page names ke mutabik href badal sakte hain) -->
-      <li>
-        <a href="./seoadmin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-chart-line"></i> Create post
-        </a>
-      </li>
-      <li>
-        <a href="./seoallpost.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-tags"></i> All Post
-        </a>
-      </li>
-    </ul>
-  </nav>
+        <!-- Sidebar Navigation -->
+        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
+            <nav class="w-full">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="./seoallpost.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium transition">
+                            <i class="fa-solid fa-chart-line text-indigo-400"></i> All Post
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./seoadmin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
+                            <i class="fa-solid fa-tags text-gray-400"></i> Create Post
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
-  <!-- 🚀 LOGOUT BUTTON (Wahi standard ID jo auth.js intercept karega) -->
-  <div class="border-t border-gray-700 pt-4">
-    <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
-    </a>
-  </div>
-</aside>
+            <!-- LOGOUT BUTTON -->
+            <div class="border-t border-gray-700 pt-4">
+                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
 
+        <!-- Main Workspace Area -->
         <main class="flex-1 p-8 overflow-y-auto">
-            <div class="animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold text-gray-800">Hello Manish</h2>
-                <p class="mt-2 text-gray-600">Welcome back to your administration panel.</p>
+            <div class="animate__animated animate__fadeIn max-w-6xl mx-auto">
+                
+                <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-5">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">All Blog Posts</h2>
+                        <p class="mt-1 text-sm text-gray-500">Manage, edit, or delete your published backend blogs seamlessly.</p>
+                    </div>
+                    <a href="./seoallpost.html" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add New Post
+                    </a>
+                </div>
+
+                <!-- Blogs Dynamic Table Container -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-4">Cover</th>
+                                <th class="px-6 py-4">Title & Category</th>
+                                <th class="px-6 py-4">Slug</th>
+                                <th class="px-6 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <!-- Yahan JavaScript backend se data laakar fill karegi -->
+                        <tbody id="blog-table-body" class="divide-y divide-gray-200 text-sm text-gray-700">
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-400">
+                                    <i class="fa-solid fa-spinner fa-spin mr-2 text-indigo-500"></i> Loading your amazing blogs...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </main>
 
     </div>
-    <script type="module" src="./js/auth.js"></script>
-<script type="module" src="./js/seoAuth.js"></script>
+    
+    <!-- <script type="module" src="./js/auth.js"></script> -->
+    <!-- Humne dynamic control ke liye nayi module file attach kar di -->
+    <script type="module" src="./js/seoallpost.js"></script>
 </body>
 </html>

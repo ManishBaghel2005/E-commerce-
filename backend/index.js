@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import queryRoutes from "./routes/query.routes.js";
 import leadRoutes from "./routes/lead.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import blogRoutes from "./routes/blog.routes.js"; 
 import dotenv from "dotenv";
 import dns from "dns";
 import path from "path";
@@ -41,9 +42,7 @@ app.use(cookieParser()); // Cookie Parser registration
 // ==========================================
 // STATIC FILES HANDLER (Fixes Blank Image Issue)
 // ==========================================
-// path.join aur __dirname use karne se backend uploads folder ko absolute path se accurate locate kar payega
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Sirf folders ko static banayein, poore frontend folder ko nahi!
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
 app.use('/static', express.static(path.join(__dirname, '../frontend/static')));
 
@@ -55,6 +54,7 @@ app.use('/', authRoutes); // Auth routes matching view pages directly
 app.use('/api/queries', queryRoutes);
 app.use('/api/lead', leadRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use('/api/blogs', blogRoutes); 
 
 // Database connection & Server Boot
 const Port = process.env.PORT || 5000;

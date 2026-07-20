@@ -5,57 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEO ALORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght=0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght=400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Stable Quill 1.3.7 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet" />
+    
+    <!-- Stable Quill 1.3.7 Core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+
+    <style>
+        .ql-toolbar.ql-snow {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            border-color: #e5e7eb;
+            background-color: #f9fafb;
+        }
+        .ql-container.ql-snow {
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            border-color: #e5e7eb;
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
 </head>
 <body class="font-['Manrope'] bg-gray-50 flex flex-col h-screen">
 
-    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0">
-        <h1 class="text-xl font-bold">Hello SEO Admin </h1>
+    <!-- Top Navigation -->
+    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0 shadow-md z-10">
+        <h1 class="text-xl font-bold tracking-wide text-indigo-400">SEO ALORA <span class="text-white text-sm font-normal ml-2">| Admin Panel</span></h1>
     </nav>
 
+    <!-- Main Container -->
     <div class="flex flex-1 overflow-hidden">
         
-              <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
-  <nav class="w-full">
-    <ul class="space-y-2">
-      <!-- SEO Specific Links (Aap apne page names ke mutabik href badal sakte hain) -->
-      <li>
-        <a href="./seoadmin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-chart-line"></i> Create post
-        </a>
-      </li>
-      <li>
-        <a href="./seoallpost.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-tags"></i> All Post
-        </a>
-      </li>
-    </ul>
-  </nav>
+        <!-- Sidebar Navigation -->
+        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
+            <nav class="w-full">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="./seoadmin.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white font-medium transition bg-gray-700">
+                            <i class="fa-solid fa-chart-line text-indigo-400"></i> All Post
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./seoallpost.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
+                            <i class="fa-solid fa-tags text-gray-400"></i> Create Post
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
-  <!-- 🚀 LOGOUT BUTTON (Wahi standard ID jo auth.js intercept karega) -->
-  <div class="border-t border-gray-700 pt-4">
-    <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
-    </a>
-  </div>
-</aside>
+            <div class="border-t border-gray-700 pt-4">
+                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
 
+        <!-- Main Workspace Area -->
+        <main class="flex-1 p-8 overflow-y-auto bg-gray-50">
+            <div class="animate__animated animate__fadeIn max-w-5xl mx-auto">
+                
+                <div class="mb-8 border-b border-gray-200 pb-5">
+                    <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Hello Manish</h2>
+                    <p class="mt-2 text-sm text-gray-500">Create, style, and optimize your new SEO blog post seamlessly.</p>
+                </div>
 
-        <main class="flex-1 p-8 overflow-y-auto">
-            <div class="animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold text-gray-800">Hello Manish</h2>
-                <p class="mt-2 text-gray-600">Welcome back to your administration panel.</p>
+                <!-- Form Layout Starts (ID Added, Onsubmit Removed) -->
+                <form id="blog-form" class="space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Left Column -->
+                        <div class="lg:col-span-2 space-y-6">
+                            
+                            <!-- Post Essentials -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+                                <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Post Essentials</h3>
+                                <div>
+                                    <label for="title" class="block text-sm font-semibold text-gray-700 mb-1">Title</label>
+                                    <input type="text" id="title" placeholder="How to learn SEO in 2026" 
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-gray-800" required />
+                                </div>
+                                <div>
+                                    <label for="slug" class="block text-sm font-semibold text-gray-700 mb-1">Slug</label>
+                                    <div class="flex rounded-lg shadow-sm">
+                                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">/blog/</span>
+                                        <input type="text" id="slug" placeholder="how-to-learn-seo-in-2026" 
+                                            class="w-full px-4 py-2.5 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-gray-800" required />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Content Body & Blog Editor -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-3">
+                                <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-2">Content Body & Blog Editor</h3>
+                                <div class="rounded-lg overflow-hidden bg-white">
+                                    <div id="editor-container" class="min-h-[380px] text-gray-800 text-base">
+                                        <h1>Welcome to My Blog Post</h1>
+                                        <p>Aapka text editor ab bilkul tayyar hai. Aap bina kisi rukawat ke yahan apna content type kar sakte hain!</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SEO & Metadata Card -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+                                <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">SEO & Metadata</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="metaTitle" class="block text-sm font-semibold text-gray-700 mb-1">Meta Title</label>
+                                        <input type="text" id="metaTitle" placeholder="Master SEO Easily" 
+                                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-gray-800" />
+                                    </div>
+                                    <div>
+                                        <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+                                        <input type="text" id="category" placeholder="Marketing" 
+                                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-gray-800" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="metaDesc" class="block text-sm font-semibold text-gray-700 mb-1">Meta Description</label>
+                                    <textarea id="metaDesc" rows="2" placeholder="A complete guide to learning modern SEO methodologies." 
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-gray-800"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            <!-- Media Upload Card -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+                                <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Media & Featured Images</h3>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Cover Image</label>
+                                    
+                                    <!-- Onchange completely removed from input below -->
+                                    <label for="cover-upload" class="mt-1 flex flex-col justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 hover:border-indigo-500 transition cursor-pointer relative min-h-[150px] overflow-hidden">
+                                        <input id="cover-upload" type="file" class="hidden" accept="image/*" />
+                                        
+                                        <img id="cover-preview" class="absolute inset-0 w-full h-full object-cover hidden" alt="Preview" />
+
+                                        <div id="upload-placeholder" class="space-y-1 text-center">
+                                            <i class="fa-solid fa-image text-gray-400 text-3xl mb-2"></i>
+                                            <div class="flex text-sm text-gray-600 justify-center">
+                                                <span class="text-indigo-600 font-medium">Upload a file</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400">PNG, JPG, WEBP up to 2MB</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <input type="text" id="cover-url" placeholder="Or paste external Cover URL..." class="mt-2 w-full px-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:ring-1 focus:ring-indigo-500 outline-none text-gray-800" />
+                                </div>
+                            </div>
+
+                            <!-- Actions Card -->
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-3">
+                                <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition">
+                                    Publish Post
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
             </div>
         </main>
-
     </div>
 
+    <!-- Modular Script Connections -->
     <script type="module" src="./js/auth.js"></script>
-    <script type="module" src="./js/seoAuth.js"></script>
+    <script type="module" src="./js/seoadmin.js"></script>
 </body>
-
-
 </html>

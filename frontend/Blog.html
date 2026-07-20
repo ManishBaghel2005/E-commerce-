@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alora Radiance</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>Alora Radiance | Blog</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,28 +30,36 @@
                     ash: '#6B685F',
                 },
                 fontFamily: {
-                   
-                    robot: ['"PT Sans"', 'ui-robot', 'Georgia', 'robot'],
                     sans: ['"PT Sans"', 'Manrope', 'sans-serif'],
+                    fraunces: ['Fraunces', 'serif'],
                     roboto: ['"Roboto Mono"', 'monospace'],
                 },
             }
         }
     }
-</script>
+    </script>
 </head>
-<body>
+<body class="bg-parchment font-sans text-ink min-h-screen flex flex-col">
 
-<div id="navbar-placeholder"></div>
+    <div id="navbar-placeholder"></div>
 
+    <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
+        <div class="mb-10 animate__animated animate__fadeIn">
+            <h1 class="text-3xl font-fraunces font-bold text-ink-light mb-2">Our Latest Blogs</h1>
+            <!-- <p class="text-ash text-sm">Explore stories, tutorials, and structured learning modules instantly.</p> -->
+        </div>
 
-    <h1>THis is Our Blog</h1>
+        <!-- Yahan par standard structured cards automatic render honge -->
+        <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards dynamic JavaScript code se inject honge -->
+        </div>
+    </main>
 
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nam ipsa placeat ipsum similique rem veniam esse. Incidunt, architecto! Maxime officiis provident reprehenderit quaerat voluptas? Quidem quasi in harum natus beatae!</p>
+    <div id="footer-placeholder"></div>
 
+    <script src="./js/include.js"></script>
+    <!-- Alag external JS file connection link -->
 
-        <div id="footer-placeholder"></div>
-
-        <script src="./js/include.js"></script>
+<script type="module" src="./js/blog.js"></script>
 </body>
 </html>
