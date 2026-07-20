@@ -143,22 +143,25 @@ export const getproductbyid = async (req, res) => {
 };
 
 // 6. SEARCH PRODUCTS (Fixed reference model name to SimpleProduct and price selection to variants)
+// GET /api/products/search?q=query
 export const searchProducts = async (req, res) => {
-    try {
-        const query = req.query.q;
-        if (!query || query.trim() === "") {
-            return res.status(200).json([]);
-        }
-
-        // Case-insensitive regex search
-        const products = await SimpleProduct.find({
-            name: { $regex: query, $options: "i" }
-        })
-        .select("name imagepath variants _id") // Fixed: SimpleProduct model mapping aur 'price' ki jagah 'variants' fetch kiya
-        .limit(6); 
-
-        res.status(200).json(products);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(200).json({ success: true, products: [] });
     }
+
+    // Case-insensitive search using Regex
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: q, $options: 'i' } },
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ]
+    }).limit(6); // Limit results for clean UI suggestions
+
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };

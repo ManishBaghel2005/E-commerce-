@@ -33,45 +33,43 @@ export function showSuccessModal(title, message, callback) {
 }
 
 // ==========================================
-// 2. LOGOUT LOGIC (Both Main Site & Admin Sidebar)
+// 2. LOGOUT LOGIC (Admin & SEO Admin Sidebar)
 // ==========================================
-// Ek common function jo har tarah ke logout button par kaam karega
 async function handleLogout() {
     try {
         await fetch(`${BASE_URL}/api/auth/logout`, { 
             method: "POST",
             credentials: "include" 
         });
-        localStorage.clear();
-        window.location.href = "./login.html";
     } catch (err) {
         console.error("Logout error:", err);
-        localStorage.clear();
-        window.location.href = "./login.html";
     }
+    localStorage.clear();
+    window.location.href = "./login.html";
 }
 
-// Pure document par listener laga diya taaki kisi bhi page par koi bhi logout button ho, wo kaam kare
 document.addEventListener("click", (e) => {
-    // 1. Agar admin sidebar ka logout button click hua ho
-    if (e.target && (e.target.id === "adminLogoutBtn" || e.target.closest("#adminLogoutBtn"))) {
-        e.preventDefault();
-        handleLogout();
-    }
-    // 2. Agar website ke main navbar ka logout button click hua ho
-    if (e.target && (e.target.id === "logout-btn" || e.target.closest("#logout-btn"))) {
+    if (e.target && (e.target.id === "adminLogoutBtn" || e.target.closest("#adminLogoutBtn") || e.target.id === "logout-btn" || e.target.closest("#logout-btn"))) {
         e.preventDefault();
         handleLogout();
     }
 });
 
 // ==========================================
-// 3. LOGIN FORM SUBMISSION INTERCEPTOR
+// 3. LOGIN FORM SUBMISSION (Bulletproof Interception)
 // ==========================================
-document.addEventListener("submit", async (e) => {
-    if (e.target && e.target.id === "loginForm") {
-        e.preventDefault(); // Browser refresh permanently block
-        
+function initLoginForm() {
+    const loginForm = document.getElementById("loginForm");
+    if (!loginForm) return;
+
+    // Purane saare listeners ko remove karne ke liye clone lagayenge taaki duplicate execution na ho
+    const newForm = loginForm.cloneNode(true);
+    loginForm.parentNode.replaceChild(newForm, loginForm);
+
+    newForm.addEventListener("submit", async (e) => {
+        e.preventDefault(); // 🛑 BROWSER REFRESH KO HAR HAL MEIN BLOCK KAREGA
+        e.stopPropagation();
+
         const emailEl = document.getElementById("email");
         const passwordEl = document.getElementById("password");
         if (!emailEl || !passwordEl) return;
@@ -90,11 +88,9 @@ document.addEventListener("submit", async (e) => {
             const data = await response.json();
 
             if (response.ok) {
-                // Pehle localStorage me data set karenge
                 localStorage.setItem("user", JSON.stringify(data.user)); 
                 if (data.token) localStorage.setItem("token", data.token);
 
-                // Role ke mutabik target url select karenge
                 let targetUrl = "./index.html"; 
                 if (data.user && data.user.role === "admin") {
                     targetUrl = "./admin.html";
@@ -112,11 +108,18 @@ document.addEventListener("submit", async (e) => {
             console.error("Login Error:", error);
             showSuccessModal("Error", "Server se contact nahi ho paa raha hai.", null);
         }
-    }
-});
+    });
+}
+
+// Ensure execution on load
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initLoginForm();
+} else {
+    document.addEventListener("DOMContentLoaded", initLoginForm);
+}
 
 // ==========================================
-// 4. NAVBAR STATE RENDERING (For main index.html)
+// 4. NAVBAR STATE RENDERING
 // ==========================================
 export function renderNavbarState() {
     const authActions = document.getElementById("auth-actions");
@@ -149,8 +152,4 @@ export function renderNavbarState() {
 }
 
 document.addEventListener("partialsLoaded", renderNavbarState);
-if (document.readyState === "complete" || document.readyState === "interactive") {
-    renderNavbarState();
-} else {
-    document.addEventListener("DOMContentLoaded", renderNavbarState);
-}
+document.addEventListener("DOMContentLoaded", renderNavbarState);
