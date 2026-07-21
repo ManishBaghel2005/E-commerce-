@@ -10,6 +10,32 @@ const PRIMARY_CART_KEY = "glowRitualCartData";
 // Review API Endpoint Configuration
 const REVIEWS_API_URL = `${BASE_URL}/api/reviews`;
 
+// Helper: Check if user is logged in
+function isUserLoggedIn() {
+    return !!getAuthToken();
+}
+
+// Helper: Get stored Auth Token or Session
+function getAuthToken() {
+    // 1. Direct token check (userToken ya token key)
+    let token = localStorage.getItem('userToken') || localStorage.getItem('token');
+    if (token) return token;
+
+    // 2. Fallback: LocalStorage mein 'user' object check karein
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+        try {
+            const userData = JSON.parse(userStr);
+            // Token return karein agar object mein hai, ya Fallback identifier
+            return userData.token || userData.jwt || userData._id || userData.email || 'active-session';
+        } catch (e) {
+            console.error("User data parse karne mein error:", e);
+        }
+    }
+
+    return '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initial Product Data Load Karein
     loadProductDetails();
@@ -212,7 +238,7 @@ function updateQty(change) {
 }
 
 // ==========================================================================
-// NEW ARCHITECTURE LAYER: REVIEWS & RATINGS LOGIC HANDLERS
+// REVIEWS & RATINGS LOGIC HANDLERS
 // ==========================================================================
 
 function getProductIdFromURL() {
@@ -227,7 +253,7 @@ function initReviewsFeature() {
 
     // 1. Interactive Dynamic Star Click Actions Setup
     starButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', () => {
             const selectedValue = parseInt(button.getAttribute('data-value'));
             if (ratingInput) ratingInput.value = selectedValue;
 
@@ -249,6 +275,12 @@ function initReviewsFeature() {
         reviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Authentication Guard Check
+            if (!isUserLoggedIn()) {
+                window.location.href = './login.html';
+                return;
+            }
+
             const usernameInput = document.getElementById('review-username');
             const commentInput = document.getElementById('review-comment');
             const ratingValue = parseInt(ratingInput ? ratingInput.value : 0);
@@ -267,9 +299,13 @@ function initReviewsFeature() {
             };
 
             try {
+                const token = getAuthToken();
                 const response = await fetch(REVIEWS_API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(reviewPayload)
                 });
 

@@ -33,7 +33,7 @@ export function showSuccessModal(title, message, callback) {
 }
 
 // ==========================================
-// 2. LOGOUT LOGIC (Admin & SEO Admin Sidebar)
+// 2. LOGOUT LOGIC
 // ==========================================
 async function handleLogout() {
     try {
@@ -45,29 +45,33 @@ async function handleLogout() {
         console.error("Logout error:", err);
     }
     localStorage.clear();
-    window.location.href = "./login.html";
+    window.location.reload(); // Refresh page to reset navbar state
 }
 
 document.addEventListener("click", (e) => {
-    if (e.target && (e.target.id === "adminLogoutBtn" || e.target.closest("#adminLogoutBtn") || e.target.id === "logout-btn" || e.target.closest("#logout-btn"))) {
+    if (e.target && (
+        e.target.id === "adminLogoutBtn" || 
+        e.target.closest("#adminLogoutBtn") || 
+        e.target.id === "logout-btn" || 
+        e.target.closest("#logout-btn")
+    )) {
         e.preventDefault();
         handleLogout();
     }
 });
 
 // ==========================================
-// 3. LOGIN FORM SUBMISSION (Bulletproof Interception)
+// 3. LOGIN FORM SUBMISSION
 // ==========================================
 function initLoginForm() {
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
 
-    // Purane saare listeners ko remove karne ke liye clone lagayenge taaki duplicate execution na ho
     const newForm = loginForm.cloneNode(true);
     loginForm.parentNode.replaceChild(newForm, loginForm);
 
     newForm.addEventListener("submit", async (e) => {
-        e.preventDefault(); // 🛑 BROWSER REFRESH KO HAR HAL MEIN BLOCK KAREGA
+        e.preventDefault();
         e.stopPropagation();
 
         const emailEl = document.getElementById("email");
@@ -88,17 +92,30 @@ function initLoginForm() {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem("user", JSON.stringify(data.user)); 
-                if (data.token) localStorage.setItem("token", data.token);
+                const userData = data.user || {};
+                
+                // Extract user name properly
+                const displayName = userData.name || userData.username || (userData.email ? userData.email.split('@')[0] : "User");
+                
+                const userObjToStore = {
+                    ...userData,
+                    name: displayName
+                };
+
+                localStorage.setItem("user", JSON.stringify(userObjToStore)); 
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("userToken", data.token);
+                }
 
                 let targetUrl = "./index.html"; 
-                if (data.user && data.user.role === "admin") {
+                if (userData.role === "admin") {
                     targetUrl = "./admin.html";
-                } else if (data.user && data.user.role === "seoadmin") {
+                } else if (userData.role === "seoadmin") {
                     targetUrl = "./seoadmin.html";
                 }
 
-                showSuccessModal("Login Successful!", `Welcome back!`, () => {
+                showSuccessModal("Login Successful!", `Welcome back, ${displayName}!`, () => {
                     window.location.href = targetUrl;
                 });
             } else {
@@ -111,7 +128,6 @@ function initLoginForm() {
     });
 }
 
-// Ensure execution on load
 if (document.readyState === "complete" || document.readyState === "interactive") {
     initLoginForm();
 } else {
@@ -119,37 +135,68 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 }
 
 // ==========================================
-// 4. NAVBAR STATE RENDERING
+// 4. NAVBAR STATE RENDERING (ROBUST DOM CHECK)
 // ==========================================
 export function renderNavbarState() {
-    const authActions = document.getElementById("auth-actions");
-    if (!authActions) return; 
-
     const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
 
-    if (storedUser && token) {
+    // Helper function to render UI
+    const updateUI = (authContainer) => {
+        if (!storedUser) {
+            authContainer.innerHTML = `
+                <a href="./login.html" class="text-base text-black hover:text-gold transition">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            `;
+            return;
+        }
+
         try {
             const user = JSON.parse(storedUser);
-            authActions.innerHTML = `
+            const userName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
+
+            authContainer.innerHTML = `
                 <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
-                    <span>Hi, <b class="text-[#2A2A24] font-bold uppercase">${user.name || "User"}</b></span>
-                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm">
+                    <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
+                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                         Logout
                     </button>
                 </div>
             `;
         } catch (err) {
-            localStorage.clear();
+            console.error("Error parsing user from localStorage:", err);
+            localStorage.removeItem("user");
         }
-    } else {
-        authActions.innerHTML = `
-            <a href="./login.html" class="text-base text-black hover:text-gold transition">
-                <i class="fa-solid fa-user"></i>
-            </a>
-        `;
-    }
+    };
+
+    // Retry Mechanism: Agar component late load ho raha hai to wait karega
+    const checkAndRender = () => {
+        const authActions = document.getElementById("auth-actions");
+        if (authActions) {
+            updateUI(authActions);
+            return true;
+        }
+        return false;
+    };
+
+    // Immediate check
+    if (checkAndRender()) return;
+
+    // Retry every 100ms until DOM renders (Max 3 seconds)
+    let attempts = 0;
+    const interval = setInterval(() => {
+        attempts++;
+        if (checkAndRender() || attempts > 30) {
+            clearInterval(interval);
+        }
+    }, 100);
 }
 
+// Event Listeners for safe multi-script integration
 document.addEventListener("partialsLoaded", renderNavbarState);
 document.addEventListener("DOMContentLoaded", renderNavbarState);
+window.addEventListener("load", renderNavbarState);
+renderNavbarState();
+
+
+
