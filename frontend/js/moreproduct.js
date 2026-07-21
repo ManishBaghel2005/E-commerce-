@@ -1,15 +1,14 @@
 import BASE_URL from "./config.js";
 
-// ===== Global Dynamic UI State =====
-let PRODUCTS_DATABASE = [];      // Backend products data store
+// ===== Global State =====
+let PRODUCTS_DATABASE = [];
 let selectedCategories = [];
 let maxPriceConstraint = 1500;
 let ratingFloorFilter = 0;
 let activeQuickTag = 'all';
 
-// Pending state lead form submission ke baad dynamic product add karne ke liye
-let pendingCatalogCartAction = null;
 let pendingCatalogProductId = null;
+let pendingCatalogCartAction = null;
 
 // ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,12 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
 });
 
-// ===== Fetch backend data =====
+// ===== Fetch Backend Data =====
 async function loadProductsFromBackend() {
     const gridContainer = document.getElementById('product-grid');
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10">Loading products...</p>`;
+    gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-clay mb-2"></i><br>Loading products...</p>`;
 
     try {
         const response = await fetch(`${BASE_URL}/api/product/all`);
@@ -38,37 +37,36 @@ async function loadProductsFromBackend() {
     }
 }
 
-// Converts a raw backend product into the standard layout structure
 function normalizeProduct(product) {
     const sizes = (product.variants && product.variants.length > 0)
         ? product.variants.map(v => ({
-            ml: v.volume,
-            price: v.price,
-            mrp: v.comparePrice || v.price
+            ml: v.volume || "Standard",
+            price: v.price || 0,
+            mrp: v.comparePrice || v.price || 0
           }))
         : [{ ml: "Standard", price: product.price || 0, mrp: product.comparePrice || product.price || 0 }];
 
-    // Raw backend category ko normalized lowercase string me convert kiya ja raha hai
     let rawCategory = (product.category || "uncategorized").toLowerCase().trim();
-    
-    // Mapping agar backend me thoda bohot difference ho (Jaise 'skincare' -> 'skin')
     if (rawCategory === 'skincare') rawCategory = 'skin';
     if (rawCategory === 'bodycare') rawCategory = 'body';
 
+    const imageSrc = product.imagepath 
+        ? (product.imagepath.startsWith('http') ? product.imagepath : `${BASE_URL}${product.imagepath}`) 
+        : '';
+
     return {
         id: product._id || product.id,
-        name: product.name,
+        name: product.name || 'Untitled Product',
         category: rawCategory, 
         isBestseller: !!product.isBestseller,
         rating: product.rating || 4,
-        baseImg: `${BASE_URL}${product.imagepath}`,
+        baseImg: imageSrc,
         description: product.description || 'No description available', 
         sizes
     };
 }
 
-
-// ===== Render Catalog (Symmetric Layout and Grid Compatible) =====
+// ===== Render Catalog =====
 function renderProductCatalog(products) {
     const gridContainer = document.getElementById('product-grid');
     const noProductsPlaceholder = document.getElementById('no-products');
@@ -91,7 +89,6 @@ function renderProductCatalog(products) {
         const initialSize = product.sizes[0];
         const starsHTML = generateStarsHTML(product.rating);
 
-        // Dynamic size buttons generation matching slider's active logic cleanly
         const sizeButtonsHTML = product.sizes.map((sz, idx) => {
             const isActive = idx === 0;
             const activeClasses = isActive 
@@ -110,7 +107,7 @@ function renderProductCatalog(products) {
         }).join('');
 
         return `
-        <div data-product-id="${product.id}" class="relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate__animated animate__fadeInUp overflow-hidden">
+        <div data-product-id="${product.id}" class="relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
             
             <span class="absolute top-3 left-3 z-10 text-[9px] font-bold tracking-wider w-9 h-9 ${product.isBestseller ? 'bg-orange-600' : 'bg-black'} uppercase text-white rounded-full flex items-center justify-center shadow-md">
                 ${product.isBestseller ? 'Hot' : 'New'}
@@ -153,7 +150,6 @@ function renderProductCatalog(products) {
                 </div>
             </div>
 
-            <!-- FIXED: Pointing dynamically to local lead interceptor function instead of missing global toggleCartState -->
             <button type="button" onclick="handleCartButtonClick('${product.id}', this)" class="w-full bg-[#A0522D] hover:bg-[#8B4513] text-white py-3.5 font-semibold text-xs tracking-[0.15em] uppercase transition flex items-center justify-center gap-2 mt-auto">
                 <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
             </button>
@@ -161,7 +157,7 @@ function renderProductCatalog(products) {
     }).join('');
 }
 
-// ===== Star rating markup =====
+// ===== Rating Stars Helper =====
 function generateStarsHTML(rating) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
@@ -176,7 +172,7 @@ function generateStarsHTML(rating) {
     return html;
 }
 
-// ===== Size switch inside a card =====
+// ===== Size Switch =====
 function changeCardSize(sizeLabel, exactPrice, exactMrp, element) {
     const currentCard = element.closest('.product-card');
     if (!currentCard) return;
@@ -192,19 +188,19 @@ function changeCardSize(sizeLabel, exactPrice, exactMrp, element) {
     element.className = "size-btn text-[11px] px-2.5 py-1 rounded-full border border-ink bg-ink text-parchment font-semibold transition";
 }
 
-// ===== Quantity stepper =====
+// ===== Quantity Stepper =====
 function updateQty(change, element) {
     const parentQtyWrapper = element.closest('.qty-container');
     const targetInput = parentQtyWrapper.querySelector('.quantity');
 
-    let currentQuantityValue = parseInt(targetInput.value) || 1;
-    currentQuantityValue += change;
+    let currentQty = parseInt(targetInput.value) || 1;
+    currentQty += change;
 
-    if (currentQuantityValue < 1) currentQuantityValue = 1;
-    targetInput.value = currentQuantityValue;
+    if (currentQty < 1) currentQty = 1;
+    targetInput.value = currentQty;
 }
 
-// ===== Optimized Category & Advanced Filtering =====
+// ===== Filters Logic =====
 function filterProducts() {
     const checkboxes = document.querySelectorAll('input[name="category"]:checked');
     selectedCategories = Array.from(checkboxes).map(cb => cb.value.toLowerCase().trim());
@@ -216,7 +212,6 @@ function filterProducts() {
         if (selectedCategories.length > 0 && !selectedCategories.includes(item.category)) {
             return false;
         }
-        
         if (item.rating < ratingFloorFilter) return false;
         if (activeQuickTag === 'bestseller' && !item.isBestseller) return false;
 
@@ -248,29 +243,16 @@ function updatePriceLabel(value) {
 
 function setRatingFilter(minStars) {
     ratingFloorFilter = minStars;
-
-    document.querySelectorAll('.rating-filter-btn').forEach((btn, index) => {
-        if ((minStars === 4 && index === 0) || (minStars === 3 && index === 1)) {
-            btn.className = "rating-filter-btn flex items-center text-sm text-orange-600 font-bold w-full text-left py-0.5";
-        } else {
-            btn.className = "rating-filter-btn flex items-center text-sm text-gray-600 hover:text-orange-500 w-full text-left py-0.5";
-        }
-    });
-
     filterProducts();
 }
 
-// ===== Quick Tag Filters =====
 function applyQuickFilter(mode) {
     activeQuickTag = mode;
     const bestsellerBadge = document.getElementById('badge-bestseller');
 
     if (bestsellerBadge) {
-        if (mode === 'bestseller') {
-            bestsellerBadge.classList.remove('hidden');
-        } else {
-            bestsellerBadge.classList.add('hidden');
-        }
+        if (mode === 'bestseller') bestsellerBadge.classList.remove('hidden');
+        else bestsellerBadge.classList.add('hidden');
     }
     filterProducts();
 }
@@ -289,14 +271,10 @@ function resetFilters() {
     const bestsellerBadge = document.getElementById('badge-bestseller');
     if (bestsellerBadge) bestsellerBadge.classList.add('hidden');
 
-    document.querySelectorAll('.rating-filter-btn').forEach(btn => {
-        btn.className = "rating-filter-btn flex items-center text-sm text-gray-600 hover:text-orange-500 w-full text-left py-0.5";
-    });
-
     filterProducts();
 }
 
-// ===== Lead Verification & Interceptor =====
+// ===== Cart Interceptor & Lead Flow =====
 function handleCartButtonClick(productId, buttonElement) {
     const isLeadFilled = localStorage.getItem('leadFilled');
 
@@ -315,105 +293,80 @@ function handleCartButtonClick(productId, buttonElement) {
     }
 }
 
-// Intercept closeLeadModal from lead.js to process dynamic pending actions
-const originalCloseLeadModal = window.closeLeadModal;
-window.closeLeadModal = function() {
-    if (typeof originalCloseLeadModal === 'function') {
-        originalCloseLeadModal();
-    } else {
-        const modal = document.getElementById('leadModal');
-        if (modal) modal.classList.add('hidden');
-    }
-
-    const isLeadFilledNow = localStorage.getItem('leadFilled');
-    if (isLeadFilledNow === 'true' && pendingCatalogProductId && pendingCatalogCartAction) {
-        commitProductToCart(pendingCatalogProductId, pendingCatalogCartAction);
-    }
-
-    pendingCatalogProductId = null;
-    pendingCatalogCartAction = null;
-};
-
-// ===== Cart Operations =====
-// ===== Cart Operations =====
 function commitProductToCart(productId, actionBtnElement) {
     const cardElement = actionBtnElement.closest('.product-card');
     if (!cardElement) return;
 
-    const activeSelectedSizeBtn = cardElement.querySelector('.size-btn-container .bg-ink') || cardElement.querySelector('.bg-ink');
-    const targetActiveConfiguredSizeText = activeSelectedSizeBtn ? activeSelectedSizeBtn.innerText.trim() : "Standard";
+    const activeSelectedSizeBtn = cardElement.querySelector('.size-btn-container .bg-ink');
+    const targetSizeText = activeSelectedSizeBtn ? activeSelectedSizeBtn.innerText.trim() : "Standard";
 
     const selectedRawPriceText = cardElement.querySelector('.product-price').innerText;
-    const parsedCleanNumericPriceVal = parseInt(selectedRawPriceText.replace(/[^\d.]/g, '').trim()) || 0;
+    const parsedPriceVal = parseInt(selectedRawPriceText.replace(/[^\d.]/g, '').trim()) || 0;
 
-    const currentSelectedQuantityMetricVal = parseInt(cardElement.querySelector('.quantity').value) || 1;
-    const targetProductDisplayNameText = cardElement.querySelector('.product-name').innerText;
+    const currentQtyVal = parseInt(cardElement.querySelector('.quantity').value) || 1;
+    const targetNameText = cardElement.querySelector('.product-name').innerText;
     
     const descriptionElement = cardElement.querySelector('.product-desc-text');
-    const targetProductDescriptionText = descriptionElement ? descriptionElement.innerText.trim() : 'No description available';
+    const targetDescText = descriptionElement ? descriptionElement.innerText.trim() : 'No description available';
 
-    // FIX: Extract the image URL from the current card container layout 
     const imgElement = cardElement.querySelector('img');
-    const targetProductImageSrc = imgElement ? imgElement.getAttribute('src') : '';
+    const targetImgSrc = imgElement ? imgElement.getAttribute('src') : '';
 
-    let localShoppingSessionCartArrayStore = JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
+    let localCartArr = JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
 
-    const compositeCartUniqueIdKeyString = `${productId}_${targetActiveConfiguredSizeText}`;
-    let matchingProductCartObjectInstance = localShoppingSessionCartArrayStore.find(cartItem => cartItem.uniqueCartItemKeyId === compositeCartUniqueIdKeyString);
+    const uniqueCartKey = `${productId}_${targetSizeText}`;
+    let matchingItem = localCartArr.find(cartItem => cartItem.uniqueCartItemKeyId === uniqueCartKey);
 
-    if (matchingProductCartObjectInstance) {
-        matchingProductCartObjectInstance.qtyCountOrderMetric += currentSelectedQuantityMetricVal;
+    if (matchingItem) {
+        matchingItem.qtyCountOrderMetric += currentQtyVal;
     } else {
-        localShoppingSessionCartArrayStore.push({
-            uniqueCartItemKeyId: compositeCartUniqueIdKeyString,
+        localCartArr.push({
+            uniqueCartItemKeyId: uniqueCartKey,
             productId: productId,
-            productName: targetProductDisplayNameText,
-            productDescription: targetProductDescriptionText,
-            activeSelectedSizeConfig: targetActiveConfiguredSizeText,
-            unitPriceItemConfig: parsedCleanNumericPriceVal,
-            qtyCountOrderMetric: currentSelectedQuantityMetricVal,
-            baseImg: targetProductImageSrc // FIX: Save image property securely
+            productName: targetNameText,
+            productDescription: targetDescText,
+            activeSelectedSizeConfig: targetSizeText,
+            unitPriceItemConfig: parsedPriceVal,
+            qtyCountOrderMetric: currentQtyVal,
+            baseImg: targetImgSrc
         });
     }
 
-    localStorage.setItem('glowRitualCartData', JSON.stringify(localShoppingSessionCartArrayStore));
+    localStorage.setItem('glowRitualCartData', JSON.stringify(localCartArr));
     syncCartCounterIcon();
 
-    // Sync validation trigger towards header nodes managed globally inside main.js
     if (typeof window.updateHeaderCartCount === 'function') {
         window.updateHeaderCartCount();
     }
 
-    const backupOriginalActionBtnInnerHtmlMarkup = actionBtnElement.innerHTML;
+    const backupText = actionBtnElement.innerHTML;
     actionBtnElement.innerHTML = `<i class="fa-solid fa-circle-check text-xs"></i> Item Added!`;
     actionBtnElement.classList.replace('bg-[#A0522D]', 'bg-green-600');
 
     setTimeout(() => {
-        actionBtnElement.innerHTML = backupOriginalActionBtnInnerHtmlMarkup;
+        actionBtnElement.innerHTML = backupText;
         actionBtnElement.classList.replace('bg-green-600', 'bg-[#A0522D]');
         const inputQty = cardElement.querySelector('.quantity');
         if (inputQty) inputQty.value = 1;
     }, 1200);
 }
+
 function syncCartCounterIcon() {
-    const countDisplayTargetNode = document.getElementById('cart-count');
-    if (!countDisplayTargetNode) return;
+    const countDisplay = document.getElementById('cart-count');
+    if (!countDisplay) return;
 
     const cartCollection = JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
-    const netCombinedItemQuantitiesSum = cartCollection.reduce((total, item) => total + item.qtyCountOrderMetric, 0);
+    const netSum = cartCollection.reduce((total, item) => total + item.qtyCountOrderMetric, 0);
 
-    countDisplayTargetNode.innerText = netCombinedItemQuantitiesSum;
+    countDisplay.innerText = netSum;
 }
 
-// ===== Mobile Menu Sync =====
+// ===== Mobile Menu Helper =====
 function setupMobileMenu() {
     const menuBtn = document.getElementById("menu-btn");
     const mobileMenu = document.getElementById("mobile-menu");
     if (!menuBtn || !mobileMenu) return;
     const menuIcon = menuBtn.querySelector("i");
-
-    const mobileDropdownBtn = document.getElementById("mobile-dropdown-btn");
-    const mobileDropdownMenu = document.getElementById("mobile-dropdown-menu");
 
     menuBtn.addEventListener("click", () => {
         mobileMenu.classList.toggle("hidden");
@@ -423,17 +376,9 @@ function setupMobileMenu() {
             menuIcon.classList.replace("fa-bars", "fa-xmark");
         }
     });
-
-    if (mobileDropdownBtn && mobileDropdownMenu) {
-        const dropdownIcon = mobileDropdownBtn.querySelector("i");
-        mobileDropdownBtn.addEventListener("click", () => {
-            mobileDropdownMenu.classList.toggle("hidden");
-            dropdownIcon.classList.toggle("rotate-180");
-        });
-    }
 }
 
-// Expose functions globally for dynamic inline actions
+// Expose Global Window References
 window.changeCardSize = changeCardSize;
 window.updateQty = updateQty;
 window.filterProducts = filterProducts;
@@ -443,34 +388,3 @@ window.applyQuickFilter = applyQuickFilter;
 window.resetFilters = resetFilters;
 window.commitProductToCart = commitProductToCart;
 window.handleCartButtonClick = handleCartButtonClick;
-// Map window context alias to catch any random structural global calls securely
-window.toggleCartState = function(btn) {
-    const productId = btn.closest('.product-card')?.dataset.productId || 'unknown';
-    handleCartButtonClick(productId, btn);
-};
-
-// Map window context alias safely to prevent 'btn.closest is not a function' errors
-window.toggleCartState = function(btn) {
-    // 1. Fallback check: If 'btn' isn't a valid DOM element or lacks .closest, search the DOM
-    let resolvedButton = (btn && typeof btn.closest === 'function') ? btn : null;
-    let productId = resolvedButton?.closest('.product-card')?.dataset.productId;
-
-    // 2. If it failed to resolve from the argument, look for a global tracking fallback
-    if (!productId && pendingCatalogProductId) {
-        productId = pendingCatalogProductId;
-        resolvedButton = pendingCatalogCartAction;
-    }
-
-    // 3. Last resort emergency search using the dataset ID
-    if (!productId && typeof btn === 'string') {
-        productId = btn;
-        resolvedButton = document.querySelector(`[data-product-id="${productId}"] button[onclick*="Cart"]`);
-    }
-
-    // Run the handler if we found a valid reference, otherwise log safely
-    if (productId && resolvedButton) {
-        handleCartButtonClick(productId, resolvedButton);
-    } else {
-        console.warn("Could not resolve product card context safely inside toggleCartState:", btn);
-    }
-};
