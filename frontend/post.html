@@ -3,10 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post | Alora Radiance</title>
+    
+    <!-- 🔴 Dynamic SEO Meta Tags -->
+    <title id="dynamic-title">How to Master SEO Techniques in 2026: A Complete Beginner Guide</title>
+    <meta id="dynamic-meta-desc" name="description" content="Learn actionable search engine optimization strategies to rank your website on top of search results in 2026. Step-by-step master guide for beginners.">
+    <meta id="dynamic-keywords" name="keywords" content="SEO Guide 2026, Search Engine Optimization, On-Page SEO, Digital Marketing">
+    
+    <!-- 🟢 Canonical URL Tag -->
+    <link id="dynamic-canonical" rel="canonical" href="" />
+
+    <!-- 🟢 Publisher & Author Tags -->
+    <meta id="dynamic-publisher" name="publisher" content="Alora Radiance">
+    <meta id="dynamic-author" name="author" content="Alora Radiance">
+
+    <!-- 🟢 Robots Tag (Indexable) -->
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph (Social Previews) -->
+    <meta id="og-title" property="og:title" content="">
+    <meta id="og-desc" property="og:description" content="">
+    <meta id="og-image" property="og:image" content="">
+    <meta id="og-url" property="og:url" content="">
+    
+    <!-- JSON-LD Schema Placeholder -->
+    <script id="dynamic-json-ld" type="application/ld+json"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <script>
+
+    <!-- 🔴 Essential Custom Colors & Fonts Config for Layout & Footer -->
+    <script>
     tailwind.config = {
         theme: {
             extend: {
@@ -33,8 +59,8 @@
         }
     }
     </script>
+
     <style>
-        /* Quill/Rich Text Editor se aane wali images ko responsive rakhne ke liye */
         .post-body-content img {
             max-width: 100%;
             height: auto;
@@ -48,17 +74,21 @@
         }
     </style>
 </head>
-<body class="bg-parchment font-sans text-ink min-h-screen flex flex-col">
+<body class="bg-parchment font-sans text-ink min-h-screen flex flex-col justify-between">
 
-    <div id="navbar-placeholder"></div>
+    <!-- Header Section -->
+    <header class="w-full">
+        <div id="navbar-placeholder"></div>
+    </header>
 
+    <!-- Main Content Section -->
     <main class="flex-grow max-w-4xl w-full mx-auto px-6 py-12">
         <!-- Back Button -->
-        <a href="./Blog.html" class="inline-flex items-center gap-2 text-clay font-semibold mb-8 hover:underline">
+        <a href="./blog.html" class="inline-flex items-center gap-2 text-clay font-semibold mb-8 hover:underline">
             <i class="fa-solid fa-arrow-left"></i> Back to Blogs
         </a>
 
-        <!-- Blog Header Area -->
+        <!-- Blog Content Area -->
         <article id="blog-content-area" class="hidden">
             <div class="mb-6">
                 <div class="flex items-center space-x-3 text-xs tracking-wide mb-3">
@@ -69,28 +99,29 @@
                 <h1 id="post-title" class="text-3xl md:text-5xl font-fraunces font-bold text-ink leading-tight mb-6"></h1>
             </div>
 
-            <!-- Big Cover Image -->
+            <!-- Cover Image -->
             <div class="w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-sm mb-10 bg-gray-100">
                 <img id="post-cover" src="" alt="" class="w-full h-full object-cover">
             </div>
 
-            <!-- Main Dynamic Body Text & Inside Images Container -->
+            <!-- Content Body -->
             <div id="post-body" class="post-body-content text-base md:text-lg text-ink/90">
-                <!-- Rich text content will parse here dynamically -->
             </div>
         </article>
 
-        <!-- Loader Status Layout -->
+        <!-- Loader -->
         <div id="post-loader" class="text-center py-20 text-ash">
             <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-clay"></i>
             <p>Fetching full article details...</p>
         </div>
     </main>
 
-    <div id="footer-placeholder"></div>
+    <!-- Footer Container -->
+    <footer class="w-full mt-auto">
+        <div id="footer-placeholder"></div>
+    </footer>
 
     <script src="./js/include.js"></script>
-    <!-- Hum isi page ke script layer ko niche dynamic module me handle karenge -->
     <script type="module" src="./js/post-detail.js"></script>
 </body>
 </html>

@@ -1,63 +1,125 @@
 import BASE_URL from './config.js';
 
-async function fetchFullBlogDetail() {
-    const titleEl = document.getElementById('post-title');
-    const dateEl = document.getElementById('post-date');
-    const categoryEl = document.getElementById('post-category');
-    const coverEl = document.getElementById('post-cover');
-    const bodyEl = document.getElementById('post-body');
-    const loaderEl = document.getElementById('post-loader');
-    const contentArea = document.getElementById('blog-content-area');
-
-    // 1. URL search params se query slug extract karein
+async function fetchPostDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const slug = urlParams.get('slug');
 
     if (!slug) {
-        if (loaderEl) loaderEl.innerHTML = "<p class='text-clay font-bold'>Error: Invalid article link.</p>";
+        showError("Invalid URL: Post slug is missing.");
         return;
     }
 
     try {
-        // 2. Target specific single entry endpoint from backend
         const response = await fetch(`${BASE_URL}/api/blogs/post/${slug}`);
         const result = await response.json();
 
-        if (result.success && result.data) {
-            const post = result.data;
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to fetch article');
+        }
 
-            // Date Formatting style adjustment
-            const formattedDate = new Date(post.createdAt).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
-            });
+        // Response handling (Extracting blog object)
+        const blog = result.data || result.blog || result;
 
-            // 3. Absolute image target configurations
-            const absoluteCoverImage = post.coverImage.startsWith('http') 
-                ? post.coverImage 
-                : `${BASE_URL}${post.coverImage}`;
-
-            // 4. Update elements fields nodes values
-            titleEl.innerText = post.title;
-            dateEl.innerText = formattedDate;
-            categoryEl.innerText = post.category || "General";
-            coverEl.src = absoluteCoverImage;
-            coverEl.alt = post.title;
-
-            // ⚠️ CRITICAL: Editor dynamic content (HTML strings aur images inside content) inject karne ke liye innerHTML use karein
-            bodyEl.innerHTML = post.content;
-
-            // View configurations display block shifts toggle
-            if (loaderEl) loaderEl.classList.add('hidden');
-            if (contentArea) contentArea.classList.remove('hidden');
+        if (blog) {
+            renderArticle(blog);
+            injectSEO(blog); // 🟢 SEO Metadata Injector Call
         } else {
-            if (loaderEl) loaderEl.innerHTML = "<p class='text-clay font-bold'>Article not found.</p>";
+            showError("Article not found.");
         }
     } catch (err) {
-        console.error("Failed fetching item fields:", err);
-        if (loaderEl) loaderEl.innerHTML = "<p class='text-clay font-bold'>Error connecting to server resource.</p>";
+        console.error("Error loading blog details:", err);
+        showError("Failed to load article from server.");
     }
 }
 
-document.addEventListener('DOMContentLoaded', fetchFullBlogDetail);
+// 🟢 Article Details DOM Rendering
+function renderArticle(blog) {
+    document.getElementById('post-loader')?.classList.add('hidden');
+    document.getElementById('blog-content-area')?.classList.remove('hidden');
+
+    document.getElementById('post-title').innerText = blog.title || '';
+    document.getElementById('post-category').innerText = blog.category || 'General';
+    document.getElementById('post-body').innerHTML = blog.content || '';
+
+    if (blog.createdAt) {
+        document.getElementById('post-date').innerText = new Date(blog.createdAt).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    }
+
+    const coverImg = document.getElementById('post-cover');
+    if (coverImg && blog.coverImage) {
+        coverImg.src = blog.coverImage.startsWith('http') 
+            ? blog.coverImage 
+            : `${BASE_URL}${blog.coverImage}`;
+        coverImg.alt = blog.title || 'Blog Cover';
+    }
+}
+
+// 🟢 Dynamic SEO & Schema Injector Function
+function injectSEO(blog) {
+    const currentUrl = window.location.href;
+
+    // 1. Meta Title
+    document.title = blog.metaTitle || blog.title || "Alora Radiance";
+
+    // 2. Meta Description
+    const metaDescEl = document.getElementById('dynamic-meta-desc');
+    if (metaDescEl && blog.metaDesc) {
+        metaDescEl.setAttribute('content', blog.metaDesc);
+    }
+
+    // 3. Meta Keywords
+    const keywordsEl = document.getElementById('dynamic-keywords');
+    if (keywordsEl && blog.keywords) {
+        keywordsEl.setAttribute('content', blog.keywords);
+    }
+
+    // 4. Publisher
+    const publisherEl = document.getElementById('dynamic-publisher');
+    if (publisherEl && blog.publisher) {
+        publisherEl.setAttribute('content', blog.publisher);
+    }
+
+    // 5. Canonical Link Tag
+    const canonicalEl = document.getElementById('dynamic-canonical');
+    if (canonicalEl) {
+        canonicalEl.setAttribute('href', currentUrl);
+    }
+
+    // 6. Open Graph Tags
+    document.getElementById('og-title')?.setAttribute('content', blog.metaTitle || blog.title || '');
+    document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
+    document.getElementById('og-url')?.setAttribute('content', currentUrl);
+
+    if (blog.coverImage) {
+        const fullImgUrl = blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`;
+        document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
+    }
+
+    // 7. Schema Injection
+    const schemaEl = document.getElementById('dynamic-json-ld');
+    if (schemaEl && blog.schema) {
+        try {
+            const parsedSchema = typeof blog.schema === 'string' ? JSON.parse(blog.schema) : blog.schema;
+            schemaEl.textContent = JSON.stringify(parsedSchema, null, 2);
+        } catch (e) {
+            schemaEl.textContent = blog.schema;
+        }
+    }
+}
+function showError(msg) {
+    const loader = document.getElementById('post-loader');
+    if (loader) {
+        loader.innerHTML = `
+            <div class="text-clay">
+                <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
+                <p class="font-bold">${msg}</p>
+            </div>
+        `;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', fetchPostDetails);
