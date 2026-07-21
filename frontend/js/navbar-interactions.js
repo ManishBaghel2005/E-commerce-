@@ -1,20 +1,62 @@
 // js/navbar-interactions.js
+import BASE_URL from './config.js';
 
-// 1. Apne config file se BASE_URL ko import karein
-import BASE_URL from './config.js'; 
+// Global Event Delegation for Mobile Menu
+document.addEventListener('click', (e) => {
+    // 1. Mobile Menu Open Button Click
+    const menuBtn = e.target.closest('#menu-btn');
+    if (menuBtn) {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const drawer = document.getElementById('mobile-menu-drawer');
+        if (mobileMenu && drawer) {
+            mobileMenu.classList.remove('hidden', 'pointer-events-none');
+            requestAnimationFrame(() => {
+                mobileMenu.classList.remove('opacity-0');
+                drawer.classList.remove('-translate-x-full');
+            });
+            document.body.style.overflow = 'hidden';
+        }
+        return;
+    }
 
-// Custom event ka wait karein jo aapke include.js ne dispatch kiya hai
-document.addEventListener("partialsLoaded", () => {
-    console.log("Navbar DOM mein aa gaya hai! Ab features bind karte hain...");
-    
-    initSearchFeature();
-    initMobileMenu();
-    updateCartAndAuthStatus(); 
+    // 2. Mobile Menu Close Button Click
+    const menuCloseBtn = e.target.closest('#menu-close-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const drawer = document.getElementById('mobile-menu-drawer');
+
+    if (menuCloseBtn && mobileMenu && drawer) {
+        closeMobileDrawer(mobileMenu, drawer);
+        return;
+    }
+
+    // 3. Close when clicking background backdrop
+    if (e.target === mobileMenu && drawer) {
+        closeMobileDrawer(mobileMenu, drawer);
+    }
 });
 
-// ==========================================
-// 2. Search Box aur Backend API Integration
-// ==========================================
+function closeMobileDrawer(mobileMenu, drawer) {
+    drawer.classList.add('-translate-x-full');
+    mobileMenu.classList.add('opacity-0');
+    mobileMenu.classList.add('pointer-events-none');
+
+    setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
+// Partial Injections Event Initialization
+document.addEventListener("partialsLoaded", () => {
+    initSearchFeature();
+    updateCartAndAuthStatus();
+});
+
+document.addEventListener("cartUpdated", () => {
+    updateCartAndAuthStatus();
+});
+
+// Search Feature Integration
 function initSearchFeature() {
     const searchOpenBtn = document.getElementById('search-open-btn');
     const searchCloseBtn = document.getElementById('search-close-btn');
@@ -24,25 +66,27 @@ function initSearchFeature() {
     if (!searchContainer || !searchInput) return;
 
     let suggestionsBox = document.getElementById('search-suggestions');
-    if (!suggestionsBox) {
+    if (!suggestionsBox && searchInput.parentElement) {
         suggestionsBox = document.createElement('div');
         suggestionsBox.id = 'search-suggestions';
-        searchContainer.appendChild(suggestionsBox);
+        searchInput.parentElement.appendChild(suggestionsBox);
     }
 
-    // Styling to match app.js design pattern
-    suggestionsBox.className = 'absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 w-full';
+    if (suggestionsBox) {
+        suggestionsBox.className = 'absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1';
+    }
 
-    searchOpenBtn?.addEventListener('click', () => {
-        searchContainer.classList.toggle('search-hidden');
-        if (!searchContainer.classList.contains('search-hidden')) {
+    searchOpenBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        searchContainer.classList.toggle('hidden');
+        if (!searchContainer.classList.contains('hidden')) {
             searchInput.focus();
         }
     });
 
     searchCloseBtn?.addEventListener('click', () => {
-        searchContainer.classList.add('search-hidden');
-        suggestionsBox.classList.add('hidden');
+        searchContainer.classList.add('hidden');
+        if (suggestionsBox) suggestionsBox.classList.add('hidden');
         searchInput.value = '';
     });
 
@@ -52,7 +96,7 @@ function initSearchFeature() {
         clearTimeout(debounceTimer);
 
         if (query.length < 2) {
-            suggestionsBox.classList.add('hidden');
+            if (suggestionsBox) suggestionsBox.classList.add('hidden');
             return;
         }
 
@@ -61,17 +105,14 @@ function initSearchFeature() {
                 const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
 
-                if (data.success && data.products && data.products.length > 0) {
+                if (data.success && data.products && data.products.length > 0 && suggestionsBox) {
                     suggestionsBox.innerHTML = data.products.map(product => {
-                        // Handle dynamic image fallback
                         const imageSrc = product.imagepath 
                             ? (product.imagepath.startsWith("http") ? product.imagepath : `${BASE_URL}${product.imagepath}`)
                             : './static/placeholder.png';
 
-                        // Handle dynamic price key fallback
                         const finalPrice = product.price || product.discountprice || product.productPrice || 'N/A';
 
-                        // 🔥 FIXED: Changed redirection target from product-details.html to product.html
                         return `
                             <div onclick="window.location.href='product.html?id=${product._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
                                 <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
@@ -84,7 +125,7 @@ function initSearchFeature() {
                         `;
                     }).join('');
                     suggestionsBox.classList.remove('hidden');
-                } else {
+                } else if (suggestionsBox) {
                     suggestionsBox.innerHTML = `<p class="p-4 text-xs text-stone-500 text-center font-medium">Koi product nahi mila "<i>${query}</i>" ke liye</p>`;
                     suggestionsBox.classList.remove('hidden');
                 }
@@ -95,29 +136,14 @@ function initSearchFeature() {
     });
 
     document.addEventListener('click', (e) => {
-        if (!searchContainer.contains(e.target)) {
-            suggestionsBox.classList.add('hidden');
+        if (!searchContainer.contains(e.target) && !searchOpenBtn?.contains(e.target)) {
+            searchContainer.classList.add('hidden');
+            if (suggestionsBox) suggestionsBox.classList.add('hidden');
         }
     });
 }
 
-// ==========================================
-// 3. Mobile Hamburger Menu Toggle
-// ==========================================
-function initMobileMenu() {
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (menuBtn && mobileMenu) {
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
-}
-
-// ==========================================
-// 4. Cart Badge aur Login/Logout State Sync
-// ==========================================
+// Cart & Auth Sync
 function updateCartAndAuthStatus() {
     const cartBadge = document.getElementById('global-cart-badge');
     const authActions = document.getElementById('auth-actions');

@@ -54,7 +54,7 @@
         /* Floating Animation for Images */
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
         .animate-float {
             animation: float 4s ease-in-out infinite;
@@ -62,24 +62,22 @@
     </style>
 </head>
 
-<!-- Body me flex flex-col min-h-screen add kar diya gaya hai -->
 <body class="bg-parchment text-ink font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
 
     <!-- Header / Navbar Placeholder -->
     <div id="navbar-placeholder"></div>
 
-    <!-- MAIN CONTENT (flex-grow ensure karega ki ye footer ko hamesha neeche push kare) -->
+    <!-- MAIN CONTENT -->
     <main class="w-full flex-grow">
 
         <!-- 1. HERO SECTION -->
-        <section class="relative py-20 lg:py-28 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+        <section class="relative py-12 sm:py-16 lg:py-24 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
                 <div class="text-center max-w-3xl mx-auto">
-                    
-                    <h1 data-aos="fade-up" data-aos-delay="100" class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-semibold mt-3 mb-6 leading-tight">
-                        Nurturing Your Natural <br><span class=" text-clay font-normal">Inner Glow</span>
+                    <h1 data-aos="fade-up" data-aos-delay="100" class="font-serif text-3xl sm:text-5xl lg:text-6xl text-ink font-semibold mt-2 mb-4 sm:mb-6 leading-tight">
+                        Nurturing Your Natural <br><span class="text-clay font-normal">Inner Glow</span>
                     </h1>
-                    <p data-aos="fade-up" data-aos-delay="200" class="text-ash text-base sm:text-lg leading-relaxed">
+                    <p data-aos="fade-up" data-aos-delay="200" class="text-ash text-sm sm:text-base lg:text-lg leading-relaxed px-2 sm:px-0">
                         At Alora Radiance, we believe that true beauty stems from nature's purest elements. We craft botanical skincare designed to honor, nourish, and enhance your skin's natural vitality.
                     </p>
                 </div>
@@ -87,58 +85,54 @@
         </section>
 
         <!-- 2. OUR STORY -->
-        <section class="py-16 bg-white/60">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <section class="py-12 sm:py-16 bg-white/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     
                     <!-- Left: Animated Images Grid -->
-                    <div class="relative" data-aos="fade-right">
+                    <div class="relative px-2 sm:px-0" data-aos="fade-right">
                         <div class="relative z-10 rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                             <img src="./static/product4.png" 
                                  alt="Natural Skincare Products" 
-                                 class="w-full h-[400px] sm:h-[550px] object-cover hover:scale-105 transition-transform duration-700">
+                                 class="w-full h-[670px] sm:h-[450px] lg:h-[520px] object-cover hover:scale-105 transition-transform duration-700">
                         </div>
-                        <div class="absolute -bottom-8 -right-4 sm:right-6 z-20 w-48 sm:w-64 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block animate-float">
+                        <div class="absolute -bottom-6 -right-2 sm:-bottom-8 sm:right-4 z-20 w-36 sm:w-56 lg:w-64 rounded-2xl overflow-hidden shadow-2xl border-4 border-white animate-float">
                             <img src="./static/products.png" 
                                  alt="Organic Ingredients" 
-                                 class="w-full h-48 object-cover">
+                                 class="w-full h-28 sm:h-40 lg:h-48 object-cover">
                         </div>
-                        <!-- <div class="absolute -top-6 -left-6 bg-sage-light text-ink-light p-6 rounded-full w-28 h-28 flex flex-col items-center justify-center font-serif text-center shadow-md z-20">
-                            <span class="text-2xl font-bold">100%</span>
-                            <span class="text-xs uppercase tracking-wider font-sans">Organic</span>
-                        </div> -->
                     </div>
 
                     <!-- Right: Story Content -->
-                    <div data-aos="fade-left" class="space-y-6">
-                        <span class="font-roboto text-xs text-gold uppercase tracking-widest font-semibold">Our Journey</span>
-                        <h2 class="font-serif text-3xl sm:text-4xl text-ink font-semibold leading-snug">
-                            Crafted from Earth, <br>Perfected by Science
+                    <div data-aos="fade-left" class="space-y-4 sm:space-y-6 mt-6 lg:mt-0 px-2 sm:px-0">
+                        <span class="font-roboto text-xs text-gold uppercase tracking-widest font-semibold block">Our Journey</span>
+                        <h2 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-ink font-semibold leading-snug">
+                            Crafted from Earth, <br class="hidden sm:inline">Perfected by Science
                         </h2>
-                        <p class="text-ash leading-relaxed">
+                        <p class="text-ash text-sm sm:text-base leading-relaxed">
                             Founded with a mission to eliminate harsh chemicals from daily skincare, Alora Radiance combines age-old botanical wisdom with modern dermatology. Every formula is carefully curated using ethically sourced ingredients.
                         </p>
-                        <p class="text-ash leading-relaxed">
+                        <p class="text-ash text-sm sm:text-base leading-relaxed">
                             We don't believe in hiding skin behind heavy layers—our goal is to make your skin so healthy, radiant, and resilient that your confidence naturally shines through.
                         </p>
 
                         <!-- Feature List -->
-                        <div class="grid grid-cols-2 gap-4 pt-4">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-leaf text-sage text-xl"></i>
-                                <span class="text-sm font-semibold text-ink-light">Cruelty-Free</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2 sm:pt-4">
+                            <div class="flex items-center gap-3 bg-white/40 p-2 sm:p-0 rounded-lg">
+                                <i class="fa-solid fa-leaf text-sage text-lg sm:text-xl"></i>
+                                <span class="text-xs sm:text-sm font-semibold text-ink-light">Cruelty-Free</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-droplet text-sage text-xl"></i>
-                                <span class="text-sm font-semibold text-ink-light">Paraben Free</span>
+                            <div class="flex items-center gap-3 bg-white/40 p-2 sm:p-0 rounded-lg">
+                                <i class="fa-solid fa-droplet text-sage text-lg sm:text-xl"></i>
+                                <span class="text-xs sm:text-sm font-semibold text-ink-light">Paraben Free</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-seedling text-sage text-xl"></i>
-                                <span class="text-sm font-semibold text-ink-light">Sustainably Sourced</span>
+                            <div class="flex items-center gap-3 bg-white/40 p-2 sm:p-0 rounded-lg">
+                                <i class="fa-solid fa-seedling text-sage text-lg sm:text-xl"></i>
+                                <span class="text-xs sm:text-sm font-semibold text-ink-light">Sustainably Sourced</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-shield-halved text-sage text-xl"></i>
-                                <span class="text-sm font-semibold text-ink-light">Dermatologist Tested</span>
+                            <div class="flex items-center gap-3 bg-white/40 p-2 sm:p-0 rounded-lg">
+                                <i class="fa-solid fa-shield-halved text-sage text-lg sm:text-xl"></i>
+                                <span class="text-xs sm:text-sm font-semibold text-ink-light">Dermatologist Tested</span>
                             </div>
                         </div>
                     </div>
@@ -148,43 +142,43 @@
         </section>
 
         <!-- 3. VALUES SECTION -->
-        <section class="py-20">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+        <section class="py-12 sm:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+                <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-16" data-aos="fade-up">
                     <span class="font-roboto text-xs text-clay uppercase tracking-widest font-semibold">Why Choose Alora</span>
-                    <h2 class="font-serif text-3xl sm:text-4xl text-ink font-semibold mt-2">Pillars of Our Promise</h2>
+                    <h2 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-ink font-semibold mt-2">Pillars of Our Promise</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     <!-- Card 1 -->
-                    <div data-aos="zoom-in" data-aos-delay="100" class="bg-card p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light hover:-translate-y-2 group">
-                        <div class="w-14 h-14 bg-sage-light text-sage rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-sage group-hover:text-white transition-colors duration-300">
+                    <div data-aos="zoom-in" data-aos-delay="100" class="bg-card p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light hover:-translate-y-1 group">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-sage-light text-sage rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4 sm:mb-6 group-hover:bg-sage group-hover:text-white transition-colors duration-300">
                             <i class="fa-solid fa-spa"></i>
                         </div>
-                        <h3 class="font-serif text-xl font-semibold text-ink mb-3">Pure Botanicals</h3>
-                        <p class="text-ash text-sm leading-relaxed">
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-ink mb-2 sm:mb-3">Pure Botanicals</h3>
+                        <p class="text-ash text-xs sm:text-sm leading-relaxed">
                             We harvest raw plant extracts at their peak potency to ensure max nutrients for your skin barrier.
                         </p>
                     </div>
 
                     <!-- Card 2 -->
-                    <div data-aos="zoom-in" data-aos-delay="200" class="bg-card p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light hover:-translate-y-2 group">
-                        <div class="w-14 h-14 bg-sage-light text-clay rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-clay group-hover:text-white transition-colors duration-300">
+                    <div data-aos="zoom-in" data-aos-delay="200" class="bg-card p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light hover:-translate-y-1 group">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-sage-light text-clay rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4 sm:mb-6 group-hover:bg-clay group-hover:text-white transition-colors duration-300">
                             <i class="fa-solid fa-earth-americas"></i>
                         </div>
-                        <h3 class="font-serif text-xl font-semibold text-ink mb-3">Eco-Conscious Packaging</h3>
-                        <p class="text-ash text-sm leading-relaxed">
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-ink mb-2 sm:mb-3">Eco-Conscious Packaging</h3>
+                        <p class="text-ash text-xs sm:text-sm leading-relaxed">
                             Our bottles and jars are 100% recyclable, glass-first, minimizing environmental impact.
                         </p>
                     </div>
 
                     <!-- Card 3 -->
-                    <div data-aos="zoom-in" data-aos-delay="300" class="bg-card p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light hover:-translate-y-2 group">
-                        <div class="w-14 h-14 bg-sage-light text-gold rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-gold group-hover:text-white transition-colors duration-300">
+                    <div data-aos="zoom-in" data-aos-delay="300" class="bg-card p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light hover:-translate-y-1 group sm:col-span-2 lg:col-span-1">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-sage-light text-gold rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4 sm:mb-6 group-hover:bg-gold group-hover:text-white transition-colors duration-300">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </div>
-                        <h3 class="font-serif text-xl font-semibold text-ink mb-3">Proven Results</h3>
-                        <p class="text-ash text-sm leading-relaxed">
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-ink mb-2 sm:mb-3">Proven Results</h3>
+                        <p class="text-ash text-xs sm:text-sm leading-relaxed">
                             Formulated with scientifically backed active ingredients for visible, lasting skin transformation.
                         </p>
                     </div>
@@ -193,17 +187,17 @@
         </section>
 
         <!-- 4. CALL TO ACTION / BANNER -->
-        <section class="py-16 bg-ink text-parchment relative overflow-hidden" data-aos="fade-up">
-            <div class="max-w-5xl mx-auto px-6 text-center relative z-10 space-y-6">
-                <h2 class="font-serif text-3xl sm:text-5xl font-medium leading-tight">
+        <section class="py-12 sm:py-16 bg-ink text-parchment relative overflow-hidden" data-aos="fade-up">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10 space-y-4 sm:space-y-6">
+                <h2 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-medium leading-tight">
                     Ready to Experience <span class="italic text-clay-light">Real Radiance?</span>
                 </h2>
-                <p class="text-ash text-base max-w-2xl mx-auto">
+                <p class="text-ash text-xs sm:text-base max-w-2xl mx-auto px-2 sm:px-0">
                     Explore our full range of natural, plant-powered skincare products crafted specifically for your daily glow.
                 </p>
-                <div class="pt-4">
-                    <a href="./moreproduct.html" class="inline-block bg-clay hover:bg-clay-light text-white font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105">
-                        Explore Our Products <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                <div class="pt-2 sm:pt-4">
+                    <a href="./moreproduct.html" class="inline-block bg-clay hover:bg-clay-light text-white text-sm sm:text-base font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105">
+                        Explore Our Products <i class="fa-solid fa-arrow-right ml-2 text-xs sm:text-sm"></i>
                     </a>
                 </div>
             </div>
@@ -211,7 +205,7 @@
 
     </main>
 
-    <!-- Footer Placeholder: Hamesha Main element ke BAHAR aur SABSE NEECHE -->
+    <!-- Footer Placeholder -->
     <footer id="footer-placeholder" class="w-full"></footer>
 
     <!-- JS Files -->
@@ -225,10 +219,10 @@
             AOS.init({
                 duration: 800,
                 once: true,
-                easing: 'ease-in-out'
+                easing: 'ease-in-out',
+                disable: 'mobile' // Mobile scroll par unnecessary layout shift se bachane ke liye
             });
 
-            // include.js run hone ke baad AOS layout fix karega
             setTimeout(() => {
                 AOS.refresh();
             }, 500);
