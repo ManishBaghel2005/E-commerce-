@@ -35,7 +35,7 @@ export const register = async (req, res, next) => {
 };
 
 // ==========================================
-// LOGIN USER (Cookie Driven)
+// LOGIN USER (Cookie + Token JSON Response)
 // ==========================================
 export const login = async (req, res, next) => {
   try {
@@ -72,16 +72,18 @@ export const login = async (req, res, next) => {
     // Token Generation
     const token = generateToken(userId, userRole);
 
-    // Set Token in HttpOnly Cookie
+    // Set Token in HttpOnly Cookie (for Direct Express Route Protection)
     res.cookie("token", token, {
-      httpOnly: true, // XSS Attack protection (Frontend JS ise read/steal nahi kar sakti)
-      secure: false,  // Development me false rakhein, production (https) me true
-      maxAge: 24 * 60 * 60 * 1000 // 1 din ki expiry
+      httpOnly: true,
+      secure: false, // Production me process.env.NODE_ENV === 'production' rakhein
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000 
     });
     
-    // Frontend dynamic use ke liye response
+    // 🌟 FIX HERE: Token JSON me bhi return karein
     res.status(200).json({ 
       message: 'Login successful!', 
+      token: token,      // <-- Frontend localStorage ke liye zaruri hai
       user: userData 
     });
   } catch (error) {

@@ -17,7 +17,35 @@ const quill = new Quill('#editor-container', {
     theme: 'snow'
 });
 
-// 2. Event Listener for Live Image Preview
+// 2. Auto-generate Slug from Title
+const titleInput = document.getElementById('title');
+const slugInput = document.getElementById('slug');
+let isSlugManuallyEdited = false; // Flag to check manual edits
+
+// User manual slug badle toh auto-update stop kar do
+slugInput.addEventListener('input', () => {
+    if (slugInput.value.trim() !== '') {
+        isSlugManuallyEdited = true;
+    } else {
+        isSlugManuallyEdited = false; // Empty karne par dubara auto-sync on
+    }
+});
+
+// Title change par auto slug generator
+titleInput.addEventListener('input', () => {
+    if (!isSlugManuallyEdited) {
+        const slugValue = titleInput.value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9 -]/g, '')  // Special chars remove
+            .replace(/\s+/g, '-')         // Spaces -> hyphens
+            .replace(/-+/g, '-');         // Multiple hyphens -> single hyphen
+
+        slugInput.value = slugValue;
+    }
+});
+
+// 3. Event Listener for Live Image Preview
 const coverUpload = document.getElementById('cover-upload');
 const coverPreview = document.getElementById('cover-preview');
 const uploadPlaceholder = document.getElementById('upload-placeholder');
@@ -38,7 +66,7 @@ coverUpload.addEventListener('change', function(event) {
     }
 });
 
-// 3. Handle Form Submit and API Request
+// 4. Handle Form Submit and API Request
 const blogForm = document.getElementById('blog-form');
 const submitBtn = document.getElementById('submit-btn');
 
@@ -46,11 +74,14 @@ blogForm.addEventListener('submit', async function(event) {
     event.preventDefault(); // Default submission reload rokne ke liye
 
     // Input values collect karna
-    const title = document.getElementById('title').value.trim();
-    const slug = document.getElementById('slug').value.trim();
+    const title = titleInput.value.trim();
+    const slug = slugInput.value.trim();
     const metaTitle = document.getElementById('metaTitle').value.trim();
+    const keywords = document.getElementById('keywords').value.trim();
     const category = document.getElementById('category').value.trim();
     const metaDesc = document.getElementById('metaDesc').value.trim();
+    const schema = document.getElementById('schema').value.trim();
+    const publisher = document.getElementById('publisher').value.trim();
     const coverUrl = document.getElementById('cover-url').value.trim();
     
     // Quill Rich text editor se direct HTML string nikalna
@@ -63,14 +94,27 @@ blogForm.addEventListener('submit', async function(event) {
         return;
     }
 
-    // Backend payload design using FormData (Kyunki hum image file upload kar rahe hain)
+    // Schema JSON Validator
+    if (schema) {
+        try {
+            JSON.parse(schema);
+        } catch (e) {
+            alert("⚠️ Schema (JSON-LD) ka format sahi nahi hai! Please valid JSON enter karein.");
+            return;
+        }
+    }
+
+    // Backend payload design using FormData
     const formData = new FormData();
     formData.append('title', title);
     formData.append('slug', slug);
     formData.append('content', content);
     formData.append('metaTitle', metaTitle);
+    formData.append('keywords', keywords);
     formData.append('category', category);
     formData.append('metaDesc', metaDesc);
+    formData.append('schema', schema);
+    formData.append('publisher', publisher);
 
     // Agar image select kari hai toh file bhejo, warna URL fallback karo
     if (coverFile) {
@@ -88,14 +132,13 @@ blogForm.addEventListener('submit', async function(event) {
         const response = await fetch(`${BASE_URL}/api/blogs/create`, {
             method: 'POST',
             body: formData 
-            // Note: browser multi-part header khud inject karega, custom content-type handle mat karna.
         });
 
         const data = await response.json();
 
         if (response.ok || data.success) {
             alert("🎉 Gajab! Aapka blog successfully backend pe publish ho gaya.");
-            window.location.href = "./seoallpost.html"; // All posts module page par redirect karega
+            window.location.href = "./seoallpost.html";
         } else {
             alert(`Error: ${data.message || 'Kuch galat hua post save karte waqt.'}`);
         }

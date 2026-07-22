@@ -17,7 +17,7 @@ const router = express.Router();
 const protectView = (req, res, next) => {
   const token = req.cookies.token;
 
-  // Agar token nahi mila, toh JSON response dene ke bajay directly login page par redirect kar do!
+  // Agar token nahi mila, toh directly login page par redirect kar do!
   if (!token) {
     return res.redirect("/login.html");
   }
@@ -36,7 +36,7 @@ const protectView = (req, res, next) => {
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      // Agar role match nahi karta, toh homepage par phenk do
+      // Agar role match nahi karta, toh homepage par bhej do
       return res.redirect("/index.html"); 
     }
     next();
@@ -54,11 +54,7 @@ router.post('/api/auth/logout', logout);
 // PROTECTED PAGES SERVING (Direct URL Protection)
 // ==========================================
 
-// ==========================================
-// PROTECTED PAGES SERVING (Direct URL Protection)
-// ==========================================
-
-// 1. Saare Admin Pages ki list (Aapke images ke mutabik saare pages)
+// 1. ADMIN PAGES LIST & PROTECTION LOOP
 const adminPages = [
   '/admin.html',
   '/addnewproduct.html',
@@ -68,17 +64,23 @@ const adminPages = [
   '/adminUserquery.html'
 ];
 
-// 2. Ek hi baar me saare pages par protection loop
 adminPages.forEach((page) => {
   router.get(page, protectView, authorizeRoles('admin'), (req, res) => {
-    // Ye line ensure karegi ki bina login ke koi inme se kisi page ko na dekh sake
     res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
   });
 });
 
-// SEO Admin ke liye alag se protection (Jaisa aapka pehle tha)
-router.get('/seoadmin.html', protectView, authorizeRoles('seoadmin', 'admin'), (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/seoadmin.html'));
+// 2. SEO ADMIN PAGES LIST & PROTECTION LOOP (Teeno Pages Secure Hain)
+const seoPages = [
+  '/seoadmin.html',
+  '/seoadminupdate.html',
+  '/seoallpost.html'
+];
+
+seoPages.forEach((page) => {
+  router.get(page, protectView, authorizeRoles('seoadmin', 'admin'), (req, res) => {
+    res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
+  });
 });
 
 export default router;

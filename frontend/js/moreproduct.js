@@ -6,6 +6,7 @@ let selectedCategories = [];
 let maxPriceConstraint = 1500;
 let ratingFloorFilter = 0;
 let activeQuickTag = 'all';
+let searchQuery = '';
 
 let pendingCatalogProductId = null;
 let pendingCatalogCartAction = null;
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProductsFromBackend();
     syncCartCounterIcon();
     setupMobileMenu();
+    setupSearchListeners();
 });
 
 // ===== Fetch Backend Data =====
@@ -108,7 +110,6 @@ function renderProductCatalog(products) {
 
         return `
         <div data-product-id="${product.id}" class="relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
-            
             <span class="absolute top-3 left-3 z-10 text-[9px] font-bold tracking-wider w-9 h-9 ${product.isBestseller ? 'bg-orange-600' : 'bg-black'} uppercase text-white rounded-full flex items-center justify-center shadow-md">
                 ${product.isBestseller ? 'Hot' : 'New'}
             </span>
@@ -200,7 +201,7 @@ function updateQty(change, element) {
     targetInput.value = currentQty;
 }
 
-// ===== Filters Logic =====
+// ===== Filters & Search Logic =====
 function filterProducts() {
     const checkboxes = document.querySelectorAll('input[name="category"]:checked');
     selectedCategories = Array.from(checkboxes).map(cb => cb.value.toLowerCase().trim());
@@ -209,6 +210,13 @@ function filterProducts() {
     if (priceRangeInput) maxPriceConstraint = parseInt(priceRangeInput.value);
 
     let results = PRODUCTS_DATABASE.filter(item => {
+        if (searchQuery) {
+            const matchesName = item.name.toLowerCase().includes(searchQuery);
+            const matchesDesc = item.description.toLowerCase().includes(searchQuery);
+            const matchesCategory = item.category.toLowerCase().includes(searchQuery);
+            if (!matchesName && !matchesDesc && !matchesCategory) return false;
+        }
+
         if (selectedCategories.length > 0 && !selectedCategories.includes(item.category)) {
             return false;
         }
@@ -234,6 +242,16 @@ function filterProducts() {
     }
 
     renderProductCatalog(results);
+}
+
+// 🔍 Search Listener Setup
+function setupSearchListeners() {
+    document.addEventListener('input', (e) => {
+        if (e.target && (e.target.id === 'search-input' || e.target.classList.contains('search-bar') || e.target.type === 'search')) {
+            searchQuery = e.target.value.toLowerCase().trim();
+            filterProducts();
+        }
+    });
 }
 
 function updatePriceLabel(value) {
@@ -267,7 +285,10 @@ function resetFilters() {
     updatePriceLabel(1500);
     ratingFloorFilter = 0;
     activeQuickTag = 'all';
+    searchQuery = '';
     
+    document.querySelectorAll('#search-input, .search-bar').forEach(input => input.value = '');
+
     const bestsellerBadge = document.getElementById('badge-bestseller');
     if (bestsellerBadge) bestsellerBadge.classList.add('hidden');
 
@@ -361,19 +382,25 @@ function syncCartCounterIcon() {
     countDisplay.innerText = netSum;
 }
 
-// ===== Mobile Menu Helper =====
+// ===== Robust Mobile Menu Helper =====
 function setupMobileMenu() {
-    const menuBtn = document.getElementById("menu-btn");
-    const mobileMenu = document.getElementById("mobile-menu");
-    if (!menuBtn || !mobileMenu) return;
-    const menuIcon = menuBtn.querySelector("i");
+    document.addEventListener("click", (e) => {
+        const menuBtn = e.target.closest("#menu-btn") || e.target.closest(".mobile-menu-toggle");
+        if (!menuBtn) return;
 
-    menuBtn.addEventListener("click", () => {
+        const mobileMenu = document.getElementById("mobile-menu");
+        if (!mobileMenu) return;
+
         mobileMenu.classList.toggle("hidden");
-        if (mobileMenu.classList.contains("hidden")) {
-            menuIcon.classList.replace("fa-xmark", "fa-bars");
-        } else {
-            menuIcon.classList.replace("fa-bars", "fa-xmark");
+        const menuIcon = menuBtn.querySelector("i");
+        if (menuIcon) {
+            if (mobileMenu.classList.contains("hidden")) {
+                menuIcon.classList.remove("fa-xmark");
+                menuIcon.classList.add("fa-bars");
+            } else {
+                menuIcon.classList.remove("fa-bars");
+                menuIcon.classList.add("fa-xmark");
+            }
         }
     });
 }

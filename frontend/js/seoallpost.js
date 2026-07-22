@@ -1,28 +1,24 @@
 import BASE_URL from './config.js';
 
-// DOM Elements
 const blogTableBody = document.getElementById('blog-table-body');
 
-// 1. Fetch Blogs From Backend Server on Page Load
 async function fetchAllBlogs() {
     try {
-        const response = await fetch(`${BASE_URL}/api/blogs`); // Aapka GET route jahan se saare blogs aate hain
+        const response = await fetch(`${BASE_URL}/api/blogs/all`);
         const data = await response.json();
 
-        // Check if data is array or handle accordingly
-        const blogs = data.blogs || data; 
+        const blogs = data.blogs || data.data || data;
 
         if (!response.ok || !blogs || blogs.length === 0) {
             blogTableBody.innerHTML = `
                 <tr>
                     <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                        <i class="fa-solid fa-folder-open text-2xl block mb-2 text-gray-400"></i> Koi blog nahi mila bhai! Pehle ek blog create kijiye.
+                        <i class="fa-solid fa-folder-open text-2xl block mb-2 text-gray-400"></i> Koi blog nahi mila! Create New Post par click karein.
                     </td>
                 </tr>`;
             return;
         }
 
-        // Render Tables row elements
         renderBlogTable(blogs);
 
     } catch (error) {
@@ -30,19 +26,21 @@ async function fetchAllBlogs() {
         blogTableBody.innerHTML = `
             <tr>
                 <td colspan="4" class="px-6 py-10 text-center text-red-500 font-medium">
-                    <i class="fa-solid fa-circle-exclamation mr-2"></i> Backend server se blogs load karne mein dikkat aa rahi hai.
+                    <i class="fa-solid fa-circle-exclamation mr-2"></i> Backend se blogs load nahi ho paaye.
                 </td>
             </tr>`;
     }
 }
 
-// 2. Render UI List Dynamic Function
 function renderBlogTable(blogs) {
-    blogTableBody.innerHTML = ''; // Loading text ko clear karne ke liye
+    blogTableBody.innerHTML = '';
 
     blogs.forEach(blog => {
-        // Fallback for cover image if path is wrong
-        const imageSrc = blog.coverImage ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}/${blog.coverImage}`) : 'https://placehold.co/600x400?text=No+Image';
+        const imageSrc = blog.coverImage 
+            ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) 
+            : 'https://placehold.co/600x400?text=No+Image';
+
+        const blogId = blog._id || blog.id;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50/70 transition";
@@ -60,12 +58,10 @@ function renderBlogTable(blogs) {
                 /blog/${blog.slug}
             </td>
             <td class="px-6 py-4 text-right whitespace-nowrap space-x-2">
-                <!-- EDIT BUTTON -->
-                <button data-id="${blog._id || blog.id}" class="edit-btn inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                <button data-id="${blogId}" class="edit-btn inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
                     <i class="fa-solid fa-pen-to-square"></i> Edit
                 </button>
-                <!-- DELETE BUTTON -->
-                <button data-id="${blog._id || blog.id}" class="delete-btn inline-flex items-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                <button data-id="${blogId}" class="delete-btn inline-flex items-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
                     <i class="fa-solid fa-trash-can"></i> Delete
                 </button>
             </td>
@@ -73,27 +69,24 @@ function renderBlogTable(blogs) {
         blogTableBody.appendChild(tr);
     });
 
-    // Attach event listeners to newly created buttons
     attachActionListeners();
 }
 
-// 3. Attach Listeners to Edit and Delete Buttons
 function attachActionListeners() {
-    // Handling Edit Button Kliks
+    // Edit Action Trigger
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const blogId = btn.getAttribute('data-id');
-            // Edit page par query parameter ke saath bhej denge taaki form auto-populate ho sake
-            window.location.href = `./seoadmin.html?edit=${blogId}`;
+            // seoadmin.html pe URL parameter pass karenge
+            window.location.href = `./seoadminupdate.html?id=${blogId}`;
         });
     });
 
-    // Handling Delete Button Kliks
+    // Delete Action Trigger
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const blogId = btn.getAttribute('data-id');
-            
-            if (confirm("⚠️ Bhai, kya aap pakka is blog ko delete karna chahte hain? Yeh wapas nahi aayega!")) {
+            if (confirm("Kya aap pakka is blog ko delete karna chahte hain?")) {
                 try {
                     btn.innerText = "Deleting...";
                     btn.disabled = true;
@@ -106,16 +99,15 @@ function attachActionListeners() {
 
                     if (response.ok || resData.success) {
                         alert("🗑️ Blog successfully delete ho gaya.");
-                        fetchAllBlogs(); // List refresh karne ke liye dobara run karenge
+                        fetchAllBlogs();
                     } else {
-                        alert(`Error: ${resData.message || 'Delete karne me dikkat aayi.'}`);
+                        alert(`Error: ${resData.message || 'Delete me dikkat aayi.'}`);
                         btn.innerText = "Delete";
                         btn.disabled = false;
                     }
-
                 } catch (error) {
-                    console.error("Delete operation failed:", error);
-                    alert("Server error! Delete nahi ho paaya.");
+                    console.error("Delete failure:", error);
+                    alert("Server error! Delete fail hua.");
                     btn.innerText = "Delete";
                     btn.disabled = false;
                 }
@@ -124,5 +116,4 @@ function attachActionListeners() {
     });
 }
 
-// Document Load hote hi automatically trigger kar do fetch function
 document.addEventListener('DOMContentLoaded', fetchAllBlogs);

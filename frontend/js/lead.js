@@ -2,19 +2,61 @@ import BASE_URL from "./config.js";
 
 let pendingCartAction = null;
 
-// Explicitly register events on global window for inline onclick execution
+// ==========================================
+// 1. OPEN & CLOSE MODAL FUNCTIONS
+// ==========================================
 window.openLeadModal = function(actionElement) {
     pendingCartAction = actionElement; 
     const modal = document.getElementById('leadModal');
-    if (modal) modal.classList.remove('hidden');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex'; // Extra safety fallback
+    }
 };
 
 window.closeLeadModal = function() {
     const modal = document.getElementById('leadModal');
-    if (modal) modal.classList.add('hidden');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none'; // Extra safety fallback
+    }
     pendingCartAction = null;
 };
 
+// ==========================================
+// 2. GLOBAL EVENT DELEGATION (CROSS BUTTON & OVERLAY CLICK)
+// ==========================================
+document.addEventListener('click', (event) => {
+    // A) Check if Cross (×) button was clicked
+    const isCloseBtn = event.target.closest('#closeLeadModal') || 
+                       event.target.closest('.close-modal-btn') || 
+                       event.target.innerText === '×' || 
+                       event.target.textContent.trim() === '×';
+
+    if (isCloseBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        window.closeLeadModal();
+        return;
+    }
+
+    // B) Check if clicked on Dark Backdrop Overlay outside the form
+    const modal = document.getElementById('leadModal');
+    if (modal && event.target === modal) {
+        window.closeLeadModal();
+    }
+});
+
+// ESC Key shortcut to close lead modal
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        window.closeLeadModal();
+    }
+});
+
+// ==========================================
+// 3. CART BUTTON HANDLER LOGIC
+// ==========================================
 window.handleCartButtonClick = function(buttonElement) {
     const isLeadFilled = localStorage.getItem('leadFilled');
     
@@ -31,13 +73,16 @@ window.handleCartButtonClick = function(buttonElement) {
     }
 };
 
+// ==========================================
+// 4. LEAD FORM SUBMISSION
+// ==========================================
 window.handleLeadSubmit = async function(event) {
     event.preventDefault();
     
-    const name = document.getElementById('leadName').value;
-    const email = document.getElementById('leadEmail').value;
-    const phone = document.getElementById('leadPhone').value;
-    const address = document.getElementById('leadAddress').value;
+    const name = document.getElementById('leadName')?.value;
+    const email = document.getElementById('leadEmail')?.value;
+    const phone = document.getElementById('leadPhone')?.value;
+    const address = document.getElementById('leadAddress')?.value;
 
     try {
         const response = await fetch(`${BASE_URL}/api/lead/newlead`, {
@@ -57,7 +102,7 @@ window.handleLeadSubmit = async function(event) {
             if (pendingCartAction) {
                 if (typeof window.toggleCartState === 'function') {
                     window.toggleCartState(pendingCartAction);
-                } else {
+                } else if (typeof toggleCartState === 'function') {
                     toggleCartState(pendingCartAction);
                 }
             }

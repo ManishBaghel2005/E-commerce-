@@ -38,7 +38,7 @@
 </head>
 <body class="bg-parchment text-[#2A2A24] antialiased font-sans">
 
-    <!-- ============ NAV placeholder ============ -->
+    <!-- NAV placeholder -->
     <div id="navbar-placeholder"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
@@ -104,9 +104,6 @@
                     <button id="cart-toggle-btn" class="w-[250px] bg-clay hover:bg-clay-dark text-white py-3 font-semibold text-xs tracking-[0.15em] uppercase transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
                     </button>
-                    <!-- <button class="flex-1 bg-ink text-parchment py-3.5 rounded-xl font-semibold text-sm tracking-[0.1em] uppercase shadow-sm hover:bg-ink-light transition">
-                        Buy It Now
-                    </button> -->
                 </div>
 
                 <div class="mt-8 border-t border-[#ECE4CE] pt-4">
@@ -133,94 +130,167 @@
             </div>
         </div>
 
+        <!-- REVIEWS & RATINGS SECTION -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12">
+            <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-[#ECE4CE]">
+                <h2 class="text-xl sm:text-2xl font-serif font-semibold text-ink mb-8">Customer Reviews & Ratings</h2>
 
-        <!-- ============ REVIEWS & RATINGS SECTION ============ -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12">
-    <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-[#ECE4CE]">
-        <h2 class="text-xl sm:text-2xl font-serif font-semibold text-ink mb-8">Customer Reviews & Ratings</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Left Side: Review Form -->
-            <div class="md:col-span-1 border-b md:border-b-0 md:border-r border-[#ECE4CE] pb-6 md:pb-0 md:pr-8">
-                <h3 class="text-md font-semibold text-ink mb-4">Write a Review</h3>
-                <form id="review-form" class="space-y-4">
-                    <!-- User Name -->
-                    <div>
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Your Name</label>
-                        <input type="text" id="review-username" required class="w-full border border-[#DCD3BA] rounded-lg px-3 py-2 text-sm bg-parchment/30 focus:outline-none focus:border-clay">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Left Side: Review Form -->
+                    <div class="md:col-span-1 border-b md:border-b-0 md:border-r border-[#ECE4CE] pb-6 md:pb-0 md:pr-8">
+                        <h3 class="text-md font-semibold text-ink mb-4">Write a Review</h3>
+                        <form id="review-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Your Name</label>
+                                <input type="text" id="review-username" required class="w-full border border-[#DCD3BA] rounded-lg px-3 py-2 text-sm bg-parchment/30 focus:outline-none focus:border-clay">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Your Rating</label>
+                                <div class="flex gap-2 text-xl text-gold" id="star-rating-selector">
+                                    <i class="fa-regular fa-star cursor-pointer star-btn" data-value="1"></i>
+                                    <i class="fa-regular fa-star cursor-pointer star-btn" data-value="2"></i>
+                                    <i class="fa-regular fa-star cursor-pointer star-btn" data-value="3"></i>
+                                    <i class="fa-regular fa-star cursor-pointer star-btn" data-value="4"></i>
+                                    <i class="fa-regular fa-star cursor-pointer star-btn" data-value="5"></i>
+                                </div>
+                                <input type="hidden" id="review-rating-value" value="0" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Review Comments</label>
+                                <textarea id="review-comment" rows="4" required class="w-full border border-[#DCD3BA] rounded-lg px-3 py-2 text-sm bg-parchment/30 focus:outline-none focus:border-clay" placeholder="Share your experience with this product..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-clay hover:bg-clay-dark text-white py-2.5 font-semibold text-xs tracking-wider uppercase transition">
+                                Submit Review
+                            </button>
+                        </form>
                     </div>
 
-                    <!-- Star Rating Selection -->
-                    <div>
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Your Rating</label>
-                        <div class="flex gap-2 text-xl text-gold" id="star-rating-selector">
-                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="1"></i>
-                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="2"></i>
-                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="3"></i>
-                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="4"></i>
-                            <i class="fa-regular fa-star cursor-pointer star-btn" data-value="5"></i>
-                        </div>
-                        <input type="hidden" id="review-rating-value" value="0" required>
+                    <!-- Right Side: Display Submitted Reviews -->
+                    <div class="md:col-span-2 space-y-6" id="reviews-list-container">
+                        <h3 class="text-md font-semibold text-ink mb-4">Recent Reviews</h3>
+                        <div class="text-sm text-ash italic" id="no-reviews-msg">No reviews yet for this product. Be the first to share your thoughts!</div>
                     </div>
-
-                    <!-- Review Text -->
-                    <div>
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Review Comments</label>
-                        <textarea id="review-comment" rows="4" required class="w-full border border-[#DCD3BA] rounded-lg px-3 py-2 text-sm bg-parchment/30 focus:outline-none focus:border-clay" placeholder="Share your experience with this product..."></textarea>
-                    </div>
-
-                    <button type="submit" class="w-full bg-clay hover:bg-clay-dark text-white py-2.5 font-semibold text-xs tracking-wider uppercase transition">
-                        Submit Review
-                    </button>
-                </form>
+                </div>
             </div>
-
-            <!-- Right Side: Display Submitted Reviews -->
-            <div class="md:col-span-2 space-y-6" id="reviews-list-container">
-                <h3 class="text-md font-semibold text-ink mb-4">Recent Reviews</h3>
-                
-                <!-- Dynamic Content Will Be Loaded Here via JavaScript -->
-                <div class="text-sm text-ash italic" id="no-reviews-msg">No reviews yet for this product. Be the first to share your thoughts!</div>
-                
-                <!-- Static Example Structure (JS iska content backend se fetch karega) -->
-                <!-- 
-                <div class="border-b border-[#FAF7EE] pb-4">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-medium text-ink text-sm">Rahul Sharma</span>
-                        <span class="text-xs text-ash">20 July 2026</span>
-                    </div>
-                    <div class="flex text-gold text-xs mb-2">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>...
-                    </div>
-                    <p class="text-xs text-[#5C594E] leading-relaxed">Amazing quality product! Highly recommended.</p>
-                </div> 
-                -->
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
     </main>
 
-    <!-- ============ FOOTER & MODALS ============ -->
+    <!-- FOOTER PLACEHOLDER -->
     <div id="footer-placeholder"></div>
-    <div id="lead-modal-container"></div>
 
-    <!-- Script Load Order Sequence -->
+    <!-- 🔴 EMBEDDED LEAD MODAL (Open First Time on "Add to Cart") -->
+    <div id="leadModal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gold/20 mx-4">
+            
+            <!-- CLOSE CROSS BUTTON -->
+            <button id="closeLeadModalBtn" type="button" class="absolute top-4 right-4 text-2xl font-bold text-gray-400 hover:text-black cursor-pointer transition">
+                &times;
+            </button>
+
+            <h3 class="mb-1 text-center font-serif text-xl font-bold text-[#8B4513]">Please Fill Details To Continue</h3>
+            <p class="mb-6 text-center text-xs text-gray-500">Delivery aur order confirmation ke liye details fill karein.</p>
+
+            <form id="leadModalForm" onsubmit="handleLeadModalSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">Full Name</label>
+                    <input type="text" id="leadName" required placeholder="Enter your name" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-[#8B4513]" />
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">Email Address</label>
+                    <input type="email" id="leadEmail" required placeholder="Enter your email" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-[#8B4513]" />
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">Phone Number</label>
+                    <input type="tel" id="leadPhone" required placeholder="Enter 10-digit mobile number" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-[#8B4513]" />
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">Delivery Address</label>
+                    <textarea id="leadAddress" required placeholder="Enter full address" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-[#8B4513]"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-[#8B4513] hover:bg-[#6e360f] text-white py-3 rounded-xl font-bold transition text-sm shadow-md uppercase tracking-wider">
+                    SUBMIT & ADD TO CART
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="./js/include.js"></script>
-      <script type="module" src="./js/navbar-interactions.js"></script>
+    <script type="module" src="./js/navbar-interactions.js"></script>
     <script type="module" src="./js/product.js"></script>
     <script src="./js/cart.js"></script>
     <script src="./js/app.js"></script>
     <script type="module" src="./js/contacts.js"></script>
     <script type="module" src="./js/lead.js"></script>
 
+    <!-- 🔴 LEAD MODAL TRIGGER & ADD TO CART INTERCEPTOR -->
     <script>
-        fetch('./lead.html')
-            .then(response => response.text())
-            .then(htmlContent => {
-                document.getElementById('lead-modal-container').innerHTML = htmlContent;
-            })
-            .catch(err => console.error("Error loading lead modal:", err));
+        // Check if lead user exists in localStorage
+        function isLeadSubmitted() {
+            return localStorage.getItem('alora_lead_submitted') === 'true';
+        }
+
+        function openLeadModal() {
+            const modal = document.getElementById('leadModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeLeadModal() {
+            const modal = document.getElementById('leadModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Intercept Add To Cart Button Click
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartBtn = document.getElementById('cart-toggle-btn');
+
+            if (cartBtn) {
+                cartBtn.addEventListener('click', function(e) {
+                    // Check if first-time user
+                    if (!isLeadSubmitted()) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        openLeadModal();
+                    }
+                }, true); // Capture phase listener
+            }
+        });
+
+        // Handle Lead Modal Submission
+        window.handleLeadModalSubmit = function(e) {
+            e.preventDefault();
+            // Save lead status to localStorage
+            localStorage.setItem('alora_lead_submitted', 'true');
+            closeLeadModal();
+
+            // Perform original Add To Cart Action
+            const cartBtn = document.getElementById('cart-toggle-btn');
+            if (cartBtn) {
+                cartBtn.click();
+            }
+        };
+
+        // Event listeners for closing lead modal (cross icon & background click)
+        document.addEventListener('click', function(e) {
+            const closeBtn = e.target.closest('#closeLeadModalBtn');
+            const modalOverlay = document.getElementById('leadModal');
+
+            if (closeBtn || e.target === modalOverlay) {
+                closeLeadModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLeadModal();
+            }
+        });
     </script>
 
 </body>

@@ -33,7 +33,102 @@ export function showSuccessModal(title, message, callback) {
 }
 
 // ==========================================
-// 2. LOGOUT LOGIC
+// 2. ROUTE & GUARD LOGIC (FIXED)
+// ==========================================
+function runAuthGuard() {
+    const currentPath = window.location.pathname.toLowerCase();
+
+    // Stored credentials
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token") || localStorage.getItem("userToken");
+
+    let user = null;
+    let role = "";
+
+    if (storedUser) {
+        try {
+            user = JSON.parse(storedUser);
+            // Flexible Role Normalization
+            role = user.role ? String(user.role).toLowerCase().trim() : "";
+        } catch (e) {
+            console.error("Invalid user JSON in localStorage", e);
+        }
+    }
+
+    // A) PUBLIC PAGES CHECK
+    const isPublicPage = currentPath.endsWith("login.html") || 
+                         currentPath.endsWith("index.html") || 
+                         currentPath === "/" || 
+                         currentPath.endsWith("/");
+
+    if (storedUser && user && isPublicPage) {
+        if (role.includes("seo")) {
+            window.location.replace("./seoadmin.html");
+            return;
+        } else if (role.includes("admin")) {
+            window.location.replace("./admin.html");
+            return;
+        }
+    }
+
+    // B) SEO PAGES PROTECTION GUARD
+    const isSeoPage = currentPath.includes("seoadmin") || 
+                      currentPath.includes("seoallpost") || 
+                      currentPath.includes("seoadminupdate");
+
+    if (isSeoPage) {
+        // Broad SEO role acceptance ("seoadmin", "seo", "admin")
+        const isSeoUser = role.includes("seo") || role.includes("admin");
+
+        if (!storedUser || !user || !isSeoUser) {
+            console.warn("Unauthorized access to SEO page. Clearing session & Redirecting...");
+            localStorage.clear();
+            window.location.replace("./login.html");
+            return;
+        }
+
+        // Welcome Name Render for SEO Panel
+        const welcomeText = document.querySelector("main h2");
+        if (welcomeText && user.name) {
+            const currentText = welcomeText.innerText.toLowerCase();
+            if (currentText.includes("hello") || currentText.includes("welcome")) {
+                welcomeText.innerHTML = `Hello ${user.name.toUpperCase()}`;
+            }
+        }
+    }
+
+    // C) ADMIN PAGES PROTECTION GUARD
+    const adminPagesList = [
+        "admin.html",
+        "addnewproduct.html",
+        "adminleadshow.html",
+        "adminproduct.html",
+        "adminupdateproduct.html",
+        "adminuserquery.html"
+    ];
+
+    const isAdminPage = adminPagesList.some(page => currentPath.includes(page));
+
+    if (isAdminPage) {
+        if (!storedUser || !user || !role.includes("admin")) {
+            console.warn("Unauthorized access to Admin page. Clearing session & Redirecting...");
+            localStorage.clear();
+            window.location.replace("./login.html");
+            return;
+        }
+    }
+}
+
+// Run auth guard ONLY when document is ready (Prevents double Execution clashes)
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runAuthGuard);
+} else {
+    runAuthGuard();
+}
+
+
+// ==========================================
+// 3. LOGOUT LOGIC (Handles both SEO Sidebar & Main Navbar)
 // ==========================================
 async function handleLogout() {
     try {
@@ -42,10 +137,10 @@ async function handleLogout() {
             credentials: "include" 
         });
     } catch (err) {
-        console.error("Logout error:", err);
+        console.error("Logout API error:", err);
     }
     localStorage.clear();
-    window.location.reload(); // Refresh page to reset navbar state
+    window.location.replace("./login.html");
 }
 
 document.addEventListener("click", (e) => {
@@ -61,12 +156,13 @@ document.addEventListener("click", (e) => {
 });
 
 // ==========================================
-// 3. LOGIN FORM SUBMISSION
+// 4. LOGIN FORM SUBMISSION HANDLER
 // ==========================================
 function initLoginForm() {
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
 
+    // Clone element to prevent multiple attached event listeners
     const newForm = loginForm.cloneNode(true);
     loginForm.parentNode.replaceChild(newForm, loginForm);
 
@@ -91,10 +187,9 @@ function initLoginForm() {
 
             const data = await response.json();
 
-            if (response.ok) {
-                const userData = data.user || {};
+            if (response.ok && data.success !== false) {
+                const userData = data.user || data.data || {};
                 
-                // Extract user name properly
                 const displayName = userData.name || userData.username || (userData.email ? userData.email.split('@')[0] : "User");
                 
                 const userObjToStore = {
@@ -102,16 +197,22 @@ function initLoginForm() {
                     name: displayName
                 };
 
+                // Save to localStorage
                 localStorage.setItem("user", JSON.stringify(userObjToStore)); 
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("userToken", data.token);
+                
+                const authToken = data.token || data.userToken;
+                if (authToken) {
+                    localStorage.setItem("token", authToken);
+                    localStorage.setItem("userToken", authToken);
                 }
 
+                // Role-based target URL determination
+                const role = userData.role ? userData.role.toLowerCase().trim() : "user";
+                
                 let targetUrl = "./index.html"; 
-                if (userData.role === "admin") {
+                if (role === "admin") {
                     targetUrl = "./admin.html";
-                } else if (userData.role === "seoadmin") {
+                } else if (role === "seoadmin") {
                     targetUrl = "./seoadmin.html";
                 }
 
@@ -119,7 +220,7 @@ function initLoginForm() {
                     window.location.href = targetUrl;
                 });
             } else {
-                showSuccessModal("Login Failed", data.message || "Invalid credentials.", null);
+                showSuccessModal("Login Failed", data.message || "Invalid Email or Password.", null);
             }
         } catch (error) {
             console.error("Login Error:", error);
@@ -135,12 +236,11 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 }
 
 // ==========================================
-// 4. NAVBAR STATE RENDERING (ROBUST DOM CHECK)
+// 5. NAVBAR STATE RENDERING
 // ==========================================
 export function renderNavbarState() {
     const storedUser = localStorage.getItem("user");
 
-    // Helper function to render UI
     const updateUI = (authContainer) => {
         if (!storedUser) {
             authContainer.innerHTML = `
@@ -169,7 +269,6 @@ export function renderNavbarState() {
         }
     };
 
-    // Retry Mechanism: Agar component late load ho raha hai to wait karega
     const checkAndRender = () => {
         const authActions = document.getElementById("auth-actions");
         if (authActions) {
@@ -179,10 +278,8 @@ export function renderNavbarState() {
         return false;
     };
 
-    // Immediate check
     if (checkAndRender()) return;
 
-    // Retry every 100ms until DOM renders (Max 3 seconds)
     let attempts = 0;
     const interval = setInterval(() => {
         attempts++;
@@ -192,11 +289,8 @@ export function renderNavbarState() {
     }, 100);
 }
 
-// Event Listeners for safe multi-script integration
+// Event Listeners for Navbar Rendering
 document.addEventListener("partialsLoaded", renderNavbarState);
 document.addEventListener("DOMContentLoaded", renderNavbarState);
 window.addEventListener("load", renderNavbarState);
 renderNavbarState();
-
-
-
