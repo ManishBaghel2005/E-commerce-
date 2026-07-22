@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; // Cookie parse karne ke liye
@@ -9,7 +11,6 @@ import leadRoutes from "./routes/lead.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import blogRoutes from "./routes/blog.routes.js"; 
 import reviewRoutes from "./routes/review.routes.js";
-import dotenv from "dotenv";
 import dns from "dns";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -17,7 +18,6 @@ import { fileURLToPath } from "url";
 import User from "./models/userAuth.models.js"; 
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

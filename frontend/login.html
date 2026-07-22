@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Alora Radiance</title>
+  <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -29,14 +30,14 @@
           <input type="password" id="password" required class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
         </div>
         <div class="text-right">
-          <!-- Toggle to Forgot Password view -->
-          <button type="button" id="showForgotBtn" class="text-sm text-blue-500 hover:underline">Forgot Password?</button>
+          <!-- FIX 1: Added onclick -->
+          <button type="button" id="showForgotBtn" onclick="toggleViews(true)" class="text-sm text-blue-500 hover:underline">Forgot Password?</button>
         </div>
         <button type="submit" class="w-full bg-[#2A2A24] text-white py-2.5 rounded-xl font-semibold hover:bg-orange-600 transition shadow-sm">Login</button>
       </form>
     </div>
 
-    <!-- FORGOT PASSWORD FORM (Hidden by Default) -->
+    <!-- FORGOT PASSWORD FORM -->
     <div id="forgotSection" class="hidden">
       <h2 class="text-2xl font-bold mb-2 text-center text-gray-800 tracking-tight">Forgot Password</h2>
       <p class="text-xs text-gray-500 text-center mb-6">Apna register email dalein, hum aapko password reset link bhejenge.</p>
@@ -47,7 +48,8 @@
         </div>
         <button type="submit" class="w-full bg-[#2A2A24] text-white py-2.5 rounded-xl font-semibold hover:bg-orange-600 transition shadow-sm">Send Reset Link</button>
         <div class="text-center mt-4">
-          <button type="button" id="backToLoginBtn" class="text-sm text-gray-600 hover:underline">Back to Login</button>
+          <!-- FIX 2: Added onclick -->
+          <button type="button" id="backToLoginBtn" onclick="toggleViews(false)" class="text-sm text-gray-600 hover:underline">Back to Login</button>
         </div>
       </form>
     </div>
@@ -57,7 +59,22 @@
     </p>
   </div>
 
-  <!-- FIX: app.js ko yahan se hata diya hai taaki koi state conflict na ho -->
+  <!-- Inline UI Switcher Script -->
+  <script>
+    function toggleViews(showForgot) {
+      const loginSection = document.getElementById('loginSection');
+      const forgotSection = document.getElementById('forgotSection');
+      
+      if (showForgot) {
+        loginSection.classList.add('hidden');
+        forgotSection.classList.remove('hidden');
+      } else {
+        forgotSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+      }
+    }
+  </script>
+
   <script type="module" src="./js/auth.js"></script>
 </body>
 </html>

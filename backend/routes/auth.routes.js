@@ -1,5 +1,6 @@
 import express from "express";
-import { register, login, logout } from '../controllers/auth.controllers.js';
+// 1. UPDATE: forgotPassword aur resetPassword import kiye gaye hain
+import { register, login, logout, forgotPassword, resetPassword } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -49,6 +50,19 @@ const authorizeRoles = (...roles) => {
 router.post('/api/auth/register', register);
 router.post('/api/auth/login', login);
 router.post('/api/auth/logout', logout);
+
+// 2. UPDATE: Forgot Password & Reset Password API Routes
+router.post('/api/auth/forgot-password', forgotPassword);
+router.post('/api/auth/reset-password', resetPassword);
+
+// ==========================================
+// PUBLIC PAGES SERVING
+// ==========================================
+
+// 3. UPDATE: Reset Password HTML Page route (No protection - link se browser me khulega)
+router.get('/reset-password.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../frontend/reset-password.html'));
+});
 
 // ==========================================
 // PROTECTED PAGES SERVING (Direct URL Protection)

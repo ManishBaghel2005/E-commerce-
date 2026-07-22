@@ -119,7 +119,7 @@ function runAuthGuard() {
     }
 }
 
-// Run auth guard ONLY when document is ready (Prevents double Execution clashes)
+// Run auth guard ONLY when document is ready
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", runAuthGuard);
 } else {
@@ -128,7 +128,7 @@ if (document.readyState === "loading") {
 
 
 // ==========================================
-// 3. LOGOUT LOGIC (Handles both SEO Sidebar & Main Navbar)
+// 3. LOGOUT LOGIC
 // ==========================================
 async function handleLogout() {
     try {
@@ -156,13 +156,14 @@ document.addEventListener("click", (e) => {
 });
 
 // ==========================================
-// 4. LOGIN FORM SUBMISSION HANDLER
+// 4. LOGIN & FORGOT PASSWORD FORM HANDLERS
 // ==========================================
+
+// 4.1 Login Form Handler
 function initLoginForm() {
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
 
-    // Clone element to prevent multiple attached event listeners
     const newForm = loginForm.cloneNode(true);
     loginForm.parentNode.replaceChild(newForm, loginForm);
 
@@ -197,7 +198,6 @@ function initLoginForm() {
                     name: displayName
                 };
 
-                // Save to localStorage
                 localStorage.setItem("user", JSON.stringify(userObjToStore)); 
                 
                 const authToken = data.token || data.userToken;
@@ -206,7 +206,6 @@ function initLoginForm() {
                     localStorage.setItem("userToken", authToken);
                 }
 
-                // Role-based target URL determination
                 const role = userData.role ? userData.role.toLowerCase().trim() : "user";
                 
                 let targetUrl = "./index.html"; 
@@ -229,10 +228,66 @@ function initLoginForm() {
     });
 }
 
-if (document.readyState === "complete" || document.readyState === "interactive") {
+// 4.2 NEW: Forgot Password Form Handler
+function initForgotForm() {
+    const forgotForm = document.getElementById("forgotForm");
+    if (!forgotForm) return;
+
+    const newForgotForm = forgotForm.cloneNode(true);
+    forgotForm.parentNode.replaceChild(newForgotForm, forgotForm);
+
+    newForgotForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const forgotEmailEl = document.getElementById("forgotEmail");
+        if (!forgotEmailEl) return;
+
+        const email = forgotEmailEl.value.trim();
+        if (!email) {
+            showSuccessModal("Warning", "Kripya email enter karein!", null);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+                credentials: "include"
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showSuccessModal("Reset Link Sent", data.message || "Reset link aapki email par bhej diya gaya hai!", () => {
+                    // Switch back to Login view optional
+                    const loginSection = document.getElementById('loginSection');
+                    const forgotSection = document.getElementById('forgotSection');
+                    if(loginSection && forgotSection) {
+                        forgotSection.classList.add('hidden');
+                        loginSection.classList.remove('hidden');
+                    }
+                });
+            } else {
+                showSuccessModal("Failed", data.message || "Email bhejne me issue aaya.", null);
+            }
+        } catch (error) {
+            console.error("Forgot Password Error:", error);
+            showSuccessModal("Error", "Server se connect nahi ho paa raha hai.", null);
+        }
+    });
+}
+
+function initAuthForms() {
     initLoginForm();
+    initForgotForm();
+}
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initAuthForms();
 } else {
-    document.addEventListener("DOMContentLoaded", initLoginForm);
+    document.addEventListener("DOMContentLoaded", initAuthForms);
 }
 
 // ==========================================
@@ -289,7 +344,6 @@ export function renderNavbarState() {
     }, 100);
 }
 
-// Event Listeners for Navbar Rendering
 document.addEventListener("partialsLoaded", renderNavbarState);
 document.addEventListener("DOMContentLoaded", renderNavbarState);
 window.addEventListener("load", renderNavbarState);
