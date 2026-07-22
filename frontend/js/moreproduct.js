@@ -245,13 +245,89 @@ function filterProducts() {
 }
 
 // 🔍 Search Listener Setup
+// Replace your setupSearchListeners inside `moreproduct.js` with this:
+
 function setupSearchListeners() {
-    document.addEventListener('input', (e) => {
-        if (e.target && (e.target.id === 'search-input' || e.target.classList.contains('search-bar') || e.target.type === 'search')) {
-            searchQuery = e.target.value.toLowerCase().trim();
-            filterProducts();
+    document.addEventListener('input', async (e) => {
+        const input = e.target;
+        if (!input || (input.id !== 'search-input' && !input.classList.contains('search-bar') && input.type !== 'search')) {
+            return;
         }
+
+        const query = input.value.toLowerCase().trim();
+        searchQuery = query;
+
+        // 1. Live-filter the products grid on moreproduct.html
+        filterProducts();
+
+        // 2. Fetch and show the suggestion dropdown (just like Blog.html & other pages)
+        await fetchAndShowSuggestions(query);
     });
+}
+
+// Helper to render backend suggestions dropdown under the search bar
+async function fetchAndShowSuggestions(query) {
+    const searchContainer = document.getElementById('search-container');
+    if (!searchContainer) return;
+
+    // Look for or create the suggestions container div
+    let suggestionsBox = document.getElementById('search-suggestions-box');
+    if (!suggestionsBox) {
+        suggestionsBox = document.createElement('div');
+        suggestionsBox.id = 'search-suggestions-box';
+        suggestionsBox.className = 'absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-xl shadow-2xl max-h-80 overflow-y-auto z-50 mt-1';
+        searchContainer.appendChild(suggestionsBox);
+    }
+
+    if (!query) {
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.classList.add('hidden');
+        return;
+    }
+
+    try {
+        // Fetch matching products from backend API
+        const response = await fetch(`${BASE_URL}/api/product/all`);
+        const data = await response.json();
+
+        if (!response.ok) return;
+
+        // Filter results matching search query
+        const matches = data.filter(item => {
+            const name = (item.name || '').toLowerCase();
+            const cat = (item.category || '').toLowerCase();
+            return name.includes(query) || cat.includes(query);
+        });
+
+        if (matches.length === 0) {
+            suggestionsBox.innerHTML = `<div class="p-4 text-center text-sm text-gray-400">No matching products found</div>`;
+            suggestionsBox.classList.remove('hidden');
+            return;
+        }
+
+        // Render matching suggestion items with images and titles
+        suggestionsBox.innerHTML = matches.map(prod => {
+            const imgSrc = prod.imagepath 
+                ? (prod.imagepath.startsWith('http') ? prod.imagepath : `${BASE_URL}${prod.imagepath}`) 
+                : '';
+            const price = prod.price || (prod.variants && prod.variants[0] ? prod.variants[0].price : 'N/A');
+
+            return `
+                <a href="./product.html?id=${prod._id || prod.id}" class="flex items-center gap-3 p-3 hover:bg-amber-50/50 transition border-b border-gray-100 last:border-none group">
+                    <img src="${imgSrc}" alt="${prod.name}" class="w-10 h-10 object-contain rounded bg-white border p-1">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-800 truncate group-hover:text-amber-700">${prod.name}</p>
+                        <p class="text-xs text-amber-800 font-semibold">₹${price}</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-300 group-hover:text-amber-700"></i>
+                </a>
+            `;
+        }).join('');
+
+        suggestionsBox.classList.remove('hidden');
+    } catch (err) {
+        console.error("Error fetching suggestions:", err);
+    }
 }
 
 function updatePriceLabel(value) {
@@ -383,27 +459,81 @@ function syncCartCounterIcon() {
 }
 
 // ===== Robust Mobile Menu Helper =====
+// ===== Robust Mobile Menu Helper for Tailwind Slide Drawer =====
 function setupMobileMenu() {
     document.addEventListener("click", (e) => {
+        // Handle Open / Close Button Clicks
         const menuBtn = e.target.closest("#menu-btn") || e.target.closest(".mobile-menu-toggle");
-        if (!menuBtn) return;
-
+        const closeBtn = e.target.closest("#menu-close-btn");
         const mobileMenu = document.getElementById("mobile-menu");
+        const mobileDrawer = document.getElementById("mobile-menu-drawer");
+
         if (!mobileMenu) return;
 
-        mobileMenu.classList.toggle("hidden");
-        const menuIcon = menuBtn.querySelector("i");
-        if (menuIcon) {
-            if (mobileMenu.classList.contains("hidden")) {
-                menuIcon.classList.remove("fa-xmark");
-                menuIcon.classList.add("fa-bars");
-            } else {
-                menuIcon.classList.remove("fa-bars");
-                menuIcon.classList.add("fa-xmark");
+        // Open Menu Action
+        if (menuBtn) {
+            e.preventDefault();
+            mobileMenu.classList.remove("hidden", "pointer-events-none", "opacity-0");
+            if (mobileDrawer) {
+                mobileDrawer.classList.remove("-translate-x-full");
             }
+            return;
+        }
+
+        // Close Menu Action (Click on 'X' or Backdrop Overlay)
+        if (closeBtn || e.target === mobileMenu) {
+            e.preventDefault();
+            if (mobileDrawer) {
+                mobileDrawer.classList.add("-translate-x-full");
+            }
+            mobileMenu.classList.add("opacity-0");
+            setTimeout(() => {
+                mobileMenu.classList.add("hidden", "pointer-events-none");
+            }, 300);
+            return;
         }
     });
 }
+
+// ========================================================
+// 🔍 SELF-CONTAINED SEARCH HANDLER FOR MOREPRODUCT.JS ONLY
+// (Safe: Does not touch include.js or navbar.html)
+// ========================================================
+
+// 1. Toggle Search Overlay (Open / Close)
+document.addEventListener('click', (e) => {
+    // Check if clicked element is the search icon/button
+    const openBtn = e.target.closest('#search-open-btn');
+    if (openBtn) {
+        e.preventDefault();
+        const searchContainer = document.getElementById('search-container');
+        if (searchContainer) {
+            searchContainer.classList.remove('hidden');
+            const input = document.getElementById('search-input');
+            if (input) input.focus();
+        }
+        return;
+    }
+
+    // Check if clicked element is the search close button ('X')
+    const closeBtn = e.target.closest('#search-close-btn');
+    if (closeBtn) {
+        e.preventDefault();
+        const searchContainer = document.getElementById('search-container');
+        if (searchContainer) {
+            searchContainer.classList.add('hidden');
+        }
+        return;
+    }
+});
+
+// 2. Real-time Product Filtering on Typing
+document.addEventListener('input', (e) => {
+    if (e.target && e.target.id === 'search-input') {
+        searchQuery = e.target.value.toLowerCase().trim();
+        filterProducts(); // Calls your existing filter function
+    }
+});
 
 // Expose Global Window References
 window.changeCardSize = changeCardSize;

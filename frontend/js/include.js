@@ -19,10 +19,6 @@ async function loadAllPartials() {
         loadPartial("#navbar-placeholder", "./navbar.html"),
         loadPartial("#footer-placeholder", "./footer.html"),
     ]);
-
-    // Ye event fire hote hi baaki navbar-dependent JS (search, mobile
-    // menu, cart badge) ko run karna hai — DOMContentLoaded pe NAHI,
-    // kyunki tab tak navbar DOM me exist hi nahi karta.
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
