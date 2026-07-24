@@ -26,20 +26,29 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware setup
-app.use(cors({
-  origin: [
-    'http://localhost:5500', 
-    'http://127.0.0.1:5500', 
-    'http://localhost:5000', 
-    'http://127.0.0.1:5000',
-    'https://aloraproduct.netlify.app',
-    'https://aloraradiance.com',
-    'https://www.aloraradiance.com'
-  ],
-  credentials: true // ZAROORI: Taaki cookies incoming/outgoing access ho sakein
-}));
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+      'http://localhost:5000',
+      'http://127.0.0.1:5000',
+      'https://aloraproduct.netlify.app',
+      'https://aloraradiance.com',
+      'https://www.aloraradiance.com'
+    ];
+    // Allow requests with no origin (e.g. mobile apps, Postman) or matched origins
+    if (!origin || allowedOrigins.includes(origin) || /\.netlify\.app$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
+  credentials: true
+};
 
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Preflight bhi same config use kare
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

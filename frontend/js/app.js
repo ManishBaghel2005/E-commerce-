@@ -177,12 +177,8 @@ document.addEventListener("partialsLoaded", () => {
     initSearchFunctionality();
 });
 
-if (document.readyState === "complete" || document.readyState === "interactive") {
-    setTimeout(() => {
-        renderNavbarState();
-        initSearchFunctionality();
-    }, 150);
-}
+// partialsLoaded event ke baad hi renderNavbarState/initSearch chalega (see listener above)
+// Note: setTimeout fallback hataya gaya tha — navbar partial load hone se pehle #auth-actions DOM me nahi hota
 
 // Global query form handler
 document.addEventListener("submit", async (e) => {
