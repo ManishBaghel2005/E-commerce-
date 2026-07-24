@@ -48,7 +48,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Preflight bhi same config use kare
+app.options(/.*/, cors(corsOptions)); // Express 5 ke liye preflight route compatible hai
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
