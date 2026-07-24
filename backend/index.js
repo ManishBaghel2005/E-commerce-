@@ -12,6 +12,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import blogRoutes from "./routes/blog.routes.js"; 
 import reviewRoutes from "./routes/review.routes.js";
 import dns from "dns";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -31,10 +32,14 @@ app.use(cors({
     'http://127.0.0.1:5500', 
     'http://localhost:5000', 
     'http://127.0.0.1:5000',
-    'https://aloraproduct.netlify.app' // ✅ FIXED: Aakhiri se '/' hata diya
+    'https://aloraproduct.netlify.app',
+    'https://aloraradiance.com',
+    'https://www.aloraradiance.com'
   ],
   credentials: true // ZAROORI: Taaki cookies incoming/outgoing access ho sakein
 }));
+
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,9 +48,19 @@ app.use(cookieParser()); // Cookie Parser registration
 // ==========================================
 // STATIC FILES HANDLER (Fixes Blank Image Issue)
 // ==========================================
+const frontendRoot = fs.existsSync(path.join(__dirname, '../public_html'))
+  ? path.join(__dirname, '../public_html')
+  : path.join(__dirname, '../frontend');
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
-app.use('/static', express.static(path.join(__dirname, '../frontend/static')));
+app.use('/js', express.static(path.join(frontendRoot, 'js')));
+app.use('/static', express.static(path.join(frontendRoot, 'static')));
+app.use(express.static(frontendRoot));
+
+// Serve the frontend root page for GET /
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'index.html'));
+});
 
 // ==========================================
 // VIEWS & API ROUTING

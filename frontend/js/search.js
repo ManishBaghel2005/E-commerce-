@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Debounce API calls to avoid spamming backend
             debounceTimer = setTimeout(async () => {
                 try {
-                    const response = await fetch(`http://localhost:5000/api/products/search?q=${encodeURIComponent(query)}`);
+                    const response = await fetch(`${BASE_URL}/api/products/search?q=${encodeURIComponent(query)}`);
                     const data = await response.json();
 
                     if (data.success && data.products.length > 0) {

@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
+    "build": "echo \"No build step required for backend\"",
+    "postinstall": "npm run build",
     "dev": "nodemon --ignore uploads/ index.js"
   },
   "keywords": [],
