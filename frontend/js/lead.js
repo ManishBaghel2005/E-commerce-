@@ -1,16 +1,47 @@
 import BASE_URL from "./config.js";
 
 let pendingCartAction = null;
+let leadModalLoadInProgress = false;
+
+async function ensureLeadModalIsLoaded() {
+    let modal = document.getElementById('leadModal');
+    if (modal) return modal;
+
+    const container = document.getElementById('lead-modal-container');
+    if (!container) return null;
+
+    if (leadModalLoadInProgress) return null;
+
+    leadModalLoadInProgress = true;
+
+    try {
+        const response = await fetch('./lead.html');
+        const html = await response.text();
+        container.innerHTML = html;
+        modal = document.getElementById('leadModal');
+        return modal;
+    } catch (err) {
+        console.error('Lead modal load failed:', err);
+        return null;
+    } finally {
+        leadModalLoadInProgress = false;
+    }
+}
 
 // ==========================================
 // 1. OPEN & CLOSE MODAL FUNCTIONS
 // ==========================================
-window.openLeadModal = function(actionElement) {
-    pendingCartAction = actionElement; 
-    const modal = document.getElementById('leadModal');
+window.openLeadModal = async function(actionElement) {
+    pendingCartAction = actionElement;
+    let modal = document.getElementById('leadModal');
+
+    if (!modal) {
+        modal = await ensureLeadModalIsLoaded();
+    }
+
     if (modal) {
         modal.classList.remove('hidden');
-        modal.style.display = 'flex'; // Extra safety fallback
+        modal.style.display = 'flex';
     }
 };
 

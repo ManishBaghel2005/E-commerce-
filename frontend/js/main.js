@@ -250,17 +250,19 @@ function toggleCartState(button) {
     
     if (!isLeadFilled || isLeadFilled !== 'true') {
         console.log("Lead form not filled yet. Prompting user modal...");
-        
-        // lead.html se aaye modal element ko target karein
-        const leadModalElement = document.getElementById('lead-modal') || document.querySelector('#lead-modal-container > div');
-        
-        if (leadModalElement) {
-            // Modal show logic (Hidden class remove karke display flex/block karein)
-            leadModalElement.classList.remove('hidden');
-            return; // Yahin se rok dein taaki form bhare bina item cart me na jaye
+
+        if (typeof window.openLeadModal === 'function') {
+            window.openLeadModal(button);
         } else {
-            console.warn("Lead modal element DOM me nahi mila.");
+            const leadModalElement = document.getElementById('leadModal') || document.getElementById('lead-modal') || document.querySelector('#lead-modal-container > div');
+            if (leadModalElement) {
+                leadModalElement.classList.remove('hidden');
+                leadModalElement.style.display = 'flex';
+            } else {
+                console.warn("Lead modal element DOM me nahi mila.");
+            }
         }
+        return;
     }
     // -------------------------------------------------
 
