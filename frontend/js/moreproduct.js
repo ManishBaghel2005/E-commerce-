@@ -430,6 +430,15 @@ function commitProductToCart(productId, actionBtnElement) {
     }
 
     localStorage.setItem('glowRitualCartData', JSON.stringify(localCartArr));
+    document.dispatchEvent(new Event('cartUpdated'));
+
+    // Update navbar and local counters immediately (robust fallback)
+    const primary = JSON.parse(localStorage.getItem('glowCart') || '[]');
+    const legacy = JSON.parse(localStorage.getItem('glowRitualCartData') || '[]');
+    const total = (Array.isArray(primary) && primary.length > 0 ? primary : legacy).reduce((t, it) => t + (parseInt(it.qty || it.qtyCountOrderMetric || 0) || 0), 0);
+    document.querySelectorAll('#global-cart-badge, .cart-badge, #cart-count').forEach(b => { if (b) b.innerText = String(total); });
+    localStorage.setItem('cartCount', String(total));
+
     syncCartCounterIcon();
 
     if (typeof window.updateHeaderCartCount === 'function') {
@@ -450,13 +459,32 @@ function commitProductToCart(productId, actionBtnElement) {
 
 function syncCartCounterIcon() {
     const countDisplay = document.getElementById('cart-count');
-    if (!countDisplay) return;
 
-    const cartCollection = JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
-    const netSum = cartCollection.reduce((total, item) => total + item.qtyCountOrderMetric, 0);
+    // Prefer canonical glowCart (used by main.js and product.js), fallback to legacy glowRitualCartData
+    let netSum = 0;
+    try {
+        const primary = JSON.parse(localStorage.getItem('glowCart') || '[]');
+        if (Array.isArray(primary) && primary.length > 0) {
+            netSum = primary.reduce((total, item) => total + (parseInt(item.qty || item.qtyCountOrderMetric || 0) || 0), 0);
+        } else {
+            const legacy = JSON.parse(localStorage.getItem('glowRitualCartData') || '[]');
+            if (Array.isArray(legacy) && legacy.length > 0) {
+                netSum = legacy.reduce((total, item) => total + (parseInt(item.qtyCountOrderMetric || item.qty || 0) || 0), 0);
+            }
+        }
+    } catch (err) {
+        console.warn('Error reading cart for syncCartCounterIcon:', err);
+    }
 
-    countDisplay.innerText = netSum;
+    if (countDisplay) countDisplay.innerText = netSum;
+    document.querySelectorAll('#global-cart-badge, .cart-badge').forEach(b => { if (b) b.innerText = String(netSum); });
+    localStorage.setItem('cartCount', String(netSum));
 }
+
+// Live update when other pages dispatch cartUpdated
+document.addEventListener('cartUpdated', () => {
+    try { syncCartCounterIcon(); } catch (e) { console.warn('cartUpdated handler failed', e); }
+});
 
 // ===== Robust Mobile Menu Helper =====
 // ===== Robust Mobile Menu Helper for Tailwind Slide Drawer =====
@@ -545,3 +573,11 @@ window.applyQuickFilter = applyQuickFilter;
 window.resetFilters = resetFilters;
 window.commitProductToCart = commitProductToCart;
 window.handleCartButtonClick = handleCartButtonClick;
+
+// When partials (navbar) are injected, ensure the navbar badge shows current cart state
+document.addEventListener('partialsLoaded', () => {
+    try { syncCartCounterIcon(); } catch (e) { console.warn('partialsLoaded sync failed', e); }
+    if (typeof window.updateHeaderCartCount === 'function') {
+        try { window.updateHeaderCartCount(); } catch (e) { console.warn('updateHeaderCartCount failed', e); }
+    }
+});

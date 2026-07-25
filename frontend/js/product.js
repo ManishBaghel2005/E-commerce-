@@ -209,6 +209,7 @@ function handleCartButtonClick(btnElement) {
     }
 
     localStorage.setItem(PRIMARY_CART_KEY, JSON.stringify(cart));
+    document.dispatchEvent(new Event('cartUpdated'));
     console.log("Cart localstorage successfully synchronized:", cart);
     
     if (typeof window.updateHeaderCartCount === 'function') {

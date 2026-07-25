@@ -320,6 +320,7 @@ function addToCart(id, name, price, img, qty = 1, size = 'Standard', mrp = 0) {
     }
 
     localStorage.setItem('glowCart', JSON.stringify(cart));
+    document.dispatchEvent(new Event('cartUpdated'));
     updateHeaderCartCount();
 }
 

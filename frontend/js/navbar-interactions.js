@@ -148,10 +148,27 @@ function updateCartAndAuthStatus() {
     const cartBadge = document.getElementById('global-cart-badge');
     const authActions = document.getElementById('auth-actions');
 
-    const cartCount = localStorage.getItem('cartCount') || '0';
-    const token = localStorage.getItem('token'); 
+    // Compute canonical cart count directly from storage arrays to avoid stale values
+    let cartCount = 0;
+    try {
+        const primary = JSON.parse(localStorage.getItem('glowCart') || '[]');
+        if (Array.isArray(primary) && primary.length > 0) {
+            cartCount = primary.reduce((t, it) => t + (parseInt(it.qty || it.qtyCountOrderMetric || 0) || 0), 0);
+        } else {
+            const legacy = JSON.parse(localStorage.getItem('glowRitualCartData') || '[]');
+            if (Array.isArray(legacy) && legacy.length > 0) {
+                cartCount = legacy.reduce((t, it) => t + (parseInt(it.qty || it.qtyCountOrderMetric || 0) || 0), 0);
+            }
+        }
+    } catch (err) {
+        console.warn('Error computing cart count for navbar:', err);
+    }
 
-    if (cartBadge) cartBadge.innerText = cartCount;
+    const token = localStorage.getItem('token');
+
+    // Update all visible cart badges
+    document.querySelectorAll('#global-cart-badge, .cart-badge, #cart-count').forEach(b => { if (b) b.innerText = String(cartCount); });
+    localStorage.setItem('cartCount', String(cartCount));
 
     if (authActions && token) {
         authActions.innerHTML = `
