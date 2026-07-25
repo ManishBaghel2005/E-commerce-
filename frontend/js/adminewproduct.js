@@ -2,11 +2,12 @@ import BASE_URL from "./config.js";
 
 /**
  * 1. Reusable template helper for dynamic variant markup rows.
+ * Added Combo Options ('Combo', 'Pack of 2', 'Pack of 3', 'Kit') to the volume selection.
  */
 function getVariantRowHTML(isFirstRow = false) {
     return `
         <div>
-            ${isFirstRow ? `<label class="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">Volume</label>` : ''}
+            ${isFirstRow ? `<label class="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">Volume / Type</label>` : ''}
             <select class="v-volume w-full px-2 py-1.5 border border-gray-200 rounded-lg bg-white text-xs focus:outline-none focus:border-amber-700">
                  <option value="50g">50g</option>
                  <option value="100g">100g</option>
@@ -14,15 +15,19 @@ function getVariantRowHTML(isFirstRow = false) {
                  <option value="100ml">100ml</option>
                  <option value="200ml" selected>200ml</option>
                  <option value="500ml">500ml</option>
+                 <option value="Combo">Combo Offer</option>
+                 <option value="Pack of 2">Pack of 2</option>
+                 <option value="Pack of 3">Pack of 3</option>
+                 <option value="Kit">Skincare Kit</option>
             </select>
         </div>
         <div>
             ${isFirstRow ? `<label class="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">Offer Price (₹)</label>` : ''}
-            <input type="number" min="0" placeholder="e.g. 500" class="v-price w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-amber-700" required>
+            <input type="number" min="0" placeholder="e.g. 1399" class="v-price w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-amber-700" required>
         </div>
         <div>
             ${isFirstRow ? `<label class="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">MRP Price (₹)</label>` : ''}
-            <input type="number" min="0" placeholder="e.g. 700" class="v-comparePrice w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-amber-700">
+            <input type="number" min="0" placeholder="e.g. 1598" class="v-comparePrice w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-amber-700">
         </div>
         <div class="flex items-center gap-2">
             <div class="w-full">
@@ -53,9 +58,14 @@ function addVariantRow() {
  * 3. Removes the target variation element block.
  */
 function removeVariantRow(button) {
-    const row = button.closest('.variant-row');
-    if (row) {
-        row.remove();
+    const rows = document.querySelectorAll('.variant-row');
+    if (rows.length > 1) {
+        const row = button.closest('.variant-row');
+        if (row) {
+            row.remove();
+        }
+    } else {
+        alert("Kam se kam ek variant hona zaroori hai!");
     }
 }
 
@@ -72,7 +82,6 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     const formElement = e.target;
     const submitButton = formElement.querySelector('button[type="submit"]');
 
-    // FIX: Click freeze taaki double request se Multer crash aur Request Aborted na ho
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.innerText = "Saving Product...";
@@ -112,7 +121,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
             alert('Product successfully added!');
             formElement.reset();
             
-            // Variants container ko wapas empty karke ek single row set karna
+            // Variants container ko reset karke single default row set karna
             const container = document.getElementById("variantsContainer");
             container.innerHTML = "";
             
@@ -121,8 +130,6 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
             initialRow.innerHTML = getVariantRowHTML(true);
             container.appendChild(initialRow);
 
-            // 💡 TIP: Agar aapke paas page par table render karne ka function hai (e.g., loadProducts()), 
-            // toh use yahan call karein taaki data hilne ke bajaye seedhe update ho jaye.
             if (typeof window.loadProducts === 'function') {
                 window.loadProducts();
             } else if (typeof loadProducts === 'function') {
@@ -136,10 +143,9 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
         console.error('Submission processing failure:', err);
         alert('Server se connect nahi ho paya!');
     } finally {
-        // Button ko wapas normal state me laayein
         if (submitButton) {
             submitButton.disabled = false;
-            submitButton.innerText = "Add New Product";
+            submitButton.innerText = "Save Product With Variants";
         }
     }
 });

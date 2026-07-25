@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const ProductVariantSchema = new mongoose.Schema({
     volume: { 
         type: String,
-        enum: ['100g', '50g', '30ml', '100ml', '200ml', '500ml'], 
-        required: [true, 'Variant ka volume zaroori hai']
+        // 🔹 'Combo', 'Pack of 2', 'Pack of 3' jaise options add kiye gaye hain
+        enum: ['100g', '50g', '30ml', '100ml', '200ml', '500ml', 'Combo', 'Pack of 2', 'Pack of 3', 'Kit'], 
+        required: [true, 'Variant ka volume/type zaroori hai']
     },
     price: { 
         type: Number, 
@@ -34,14 +35,14 @@ const SimpleProductSchema = new mongoose.Schema({
         trim: true
     },
     category: {
-        type: String,
-        required: [true, 'Product category zaroori hai'],
-        enum: {
-            values: ['skin', 'face', 'cream', 'body'],
-            message: '{VALUE} valid category nahi hai. Choose from: skin, face, cream, body'
-        },
-        trim: true
+    type: String,
+    required: [true, 'Product category zaroori hai'],
+    enum: {
+        values: ['skin', 'face', 'cream', 'body', 'combo'],
+        message: '{VALUE} valid category nahi hai. Choose from: skin, face, cream, body, combo'
     },
+    trim: true
+},
     imagepath: {
         type: String,
         required: [true, 'Product image path zaroori hai']

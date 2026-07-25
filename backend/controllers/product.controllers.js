@@ -3,10 +3,16 @@ import fs from 'fs';
 import path from "path";
 
 // 1. CREATE (Naya Product Add Karna)
+
 export const addnewproduct = async (req, res) => {
     try {
-        const { name, description, category, rating, totalReviews, isAvailable } = req.body;
+        let { name, description, category, rating, totalReviews, isAvailable } = req.body;
         
+        // 🚨 FIX: Agar frontend se Duplicate HTML name ki wajah se Array aaye toh pehli value nikaal lo
+        if (Array.isArray(category)) {
+            category = category[0]; // "['combo', 'combo']" -> "combo"
+        }
+
         let variants = [];
         if (req.body.variants && req.body.variants !== "") {
             try {
@@ -57,20 +63,30 @@ export const updateproduct = async (req, res) => {
         const { id } = req.params;
         let updateProductData = { ...req.body };
 
+        // 🔹 FIX 1: Duplicate field Array handling for Category
+        if (Array.isArray(updateProductData.category)) {
+            updateProductData.category = updateProductData.category[0];
+        }
+
+        // 🔹 FIX 2: Variants array JSON Parsing
         if (req.body.variants) {
             try {
-                updateProductData.variants = JSON.parse(req.body.variants);
+                updateProductData.variants = typeof req.body.variants === 'string' 
+                    ? JSON.parse(req.body.variants) 
+                    : req.body.variants;
             } catch (e) {
-                // Input validation fallback
+                return res.status(400).json({ error: "Variants parsing failed: JSON string invalid hai" });
             }
         }
 
+        // 🔹 FIX 3: Type conversions
         if (req.body.isAvailable !== undefined) {
             updateProductData.isAvailable = req.body.isAvailable === 'true' || req.body.isAvailable === true;
         }
         if (req.body.rating) updateProductData.rating = Number(req.body.rating);
         if (req.body.totalReviews) updateProductData.totalReviews = Number(req.body.totalReviews);
 
+        // 🔹 FIX 4: Image handle
         if (req.file) {
             updateProductData.imagepath = `/uploads/${req.file.filename}`;
         } else if (req.body.oldProfile) {
@@ -79,6 +95,7 @@ export const updateproduct = async (req, res) => {
 
         delete updateProductData.oldProfile;
 
+        // 🔹 DB Update query with Schema validation
         const updatedProduct = await SimpleProduct.findByIdAndUpdate(
             id,
             updateProductData, 
@@ -86,11 +103,12 @@ export const updateproduct = async (req, res) => {
         );
 
         if (!updatedProduct) {
-            return res.status(404).json({ message: "Product database me nahi mila ya update fail hua" });
+            return res.status(404).json({ message: "Product database me nahi mila!" });
         }
 
         res.status(200).json(updatedProduct);
     } catch (err) {
+        console.error("Update Controller Error:", err);
         res.status(500).json({ error: err.message });
     }
 };

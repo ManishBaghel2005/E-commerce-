@@ -581,3 +581,4 @@ document.addEventListener('partialsLoaded', () => {
         try { window.updateHeaderCartCount(); } catch (e) { console.warn('updateHeaderCartCount failed', e); }
     }
 });
+
