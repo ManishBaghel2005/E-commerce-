@@ -3,7 +3,7 @@ import BASE_URL from "./config.js";
 // Pagination variables
 let allLeads = []; // Store original leads from API
 let currentPage = 1;
-const itemsPerPage = 5; // 1 page par sirf 5 data show hoga
+const itemsPerPage = 5; // 1 page par 5 data show hoga
 
 // Database se aane wale Date format ko human-readable banana
 function formatLeadDate(createdAtString) {
@@ -41,7 +41,7 @@ function renderLeadsTable() {
     const endIndex = startIndex + itemsPerPage;
     const paginatedLeads = allLeads.slice(startIndex, endIndex);
 
-    // Render Paginated Rows
+    // Render Paginated Rows (Sirf Name, Email, aur Joined Date)
     const tableRowsHtml = paginatedLeads.map(lead => {
         const initials = lead.name 
             ? lead.name.split(" ").filter(Boolean).map(n => n[0]).join("").slice(0, 2).toUpperCase() 
@@ -51,6 +51,7 @@ function renderLeadsTable() {
 
         return `
             <tr class="hover:bg-stone-50/50 transition border-b border-gray-100">
+                <!-- 1. Name & ID -->
                 <td class="py-4 px-6">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center font-bold text-stone-700 uppercase">
@@ -62,24 +63,16 @@ function renderLeadsTable() {
                         </div>
                     </div>
                 </td>
+
+                <!-- 2. Email Address -->
                 <td class="py-4 px-6">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-1.5 text-gray-600 text-xs">
-                            <i class="fa-regular fa-envelope text-gray-400"></i>
-                            ${lead.email}
-                        </div>
-                        <div class="flex items-center gap-1.5 text-gray-600 text-xs">
-                            <i class="fa-solid fa-phone text-gray-400"></i>
-                            ${lead.phone}
-                        </div>
+                    <div class="flex items-center gap-1.5 text-gray-600 text-xs font-medium">
+                        <i class="fa-regular fa-envelope text-gray-400"></i>
+                        ${lead.email}
                     </div>
                 </td>
-                <td class="py-4 px-6 max-w-[220px]">
-                    <div class="flex items-start gap-1.5 text-xs text-gray-500">
-                        <i class="fa-solid fa-location-dot text-gray-400 mt-0.5"></i>
-                        <span class="line-clamp-2">${lead.address || 'N/A'}</span>
-                    </div>
-                </td>
+
+                <!-- 3. Joined Date & Time -->
                 <td class="py-4 px-6 text-xs text-gray-500 font-medium">
                     <div>${formattedDate}</div>
                     <div class="text-[10px] text-gray-400 mt-0.5">${formattedTime}</div>
@@ -135,7 +128,7 @@ function renderPaginationControls() {
     }
 
     // 3. Next Button
-    const nextDisabled = currentPage === totalPages;
+    const nextDisabled = currentPage === totalPages || totalPages === 0;
     html += `
         <li>
             <button ${nextDisabled ? 'disabled' : ''} 
@@ -147,7 +140,7 @@ function renderPaginationControls() {
 
     container.innerHTML = html;
 
-    // Event Listeners attach karna (since buttons are generated dynamically)
+    // Event Listeners attach karna
     container.querySelectorAll(".page-num-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             currentPage = Number(btn.getAttribute("data-page"));
@@ -194,9 +187,8 @@ async function loadLeads() {
 
         const leadsData = await response.json();
         
-        // Leads array save karke local render function call karenge
         allLeads = leadsData.data || [];
-        currentPage = 1; // Load hone par humesha 1st page load hoga
+        currentPage = 1;
         renderLeadsTable();
 
     } catch (error) {
@@ -205,7 +197,7 @@ async function loadLeads() {
         if (tableBody) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="p-8 text-center text-red-500 text-xs font-semibold">
+                    <td colspan="3" class="p-8 text-center text-red-500 text-xs font-semibold">
                         <i class="fa-solid fa-triangle-exclamation mr-2"></i> Server se connect nahi ho paye ya data error mila.
                     </td>
                 </tr>

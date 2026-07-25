@@ -21,34 +21,34 @@
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Sidebar Navigation -->
-      <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
-  <nav class="w-full">
-    <ul class="space-y-2">
-      <li>
-        <a href="./adminproduct.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-box"></i> Product
-        </a>
-      </li>
-      <li>
-        <a href="./adminleadshow.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-compass"></i> Lead Show
-        </a>
-      </li>
-      <li>
-        <a href="./adminUserquery.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-          <i class="fa-solid fa-compass"></i> User Query
-        </a>
-      </li>
-    </ul>
-  </nav>
+        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
+            <nav class="w-full">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="./adminproduct.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
+                            <i class="fa-solid fa-box"></i> Product
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminleadshow.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium transition">
+                            <i class="fa-solid fa-compass"></i> Lead Show
+                        </a>
+                    </li>
+                    <li>
+                        <a href="./adminUserquery.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
+                            <i class="fa-solid fa-compass"></i> User Query
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
-  <!-- 🚀 LOGOUT BUTTON (Ye har page par layout ke bilkul bottom me set ho jayega) -->
-  <div class="border-t border-gray-700 pt-4">
-    <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
-    </a>
-  </div>
-</aside>
+            <!-- LOGOUT BUTTON -->
+            <div class="border-t border-gray-700 pt-4">
+                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
 
         <!-- Main Content Area -->
         <main class="flex-1 p-8 overflow-y-auto w-full space-y-6">
@@ -58,9 +58,8 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-stone-50 border-b border-gray-100 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                <th class="py-4 px-6">Lead Details</th>
-                                <th class="py-4 px-6">Contact Info</th>
-                                <th class="py-4 px-6">Address</th>
+                                <th class="py-4 px-6">Name</th>
+                                <th class="py-4 px-6">Email Address</th>
                                 <th class="py-4 px-6">Joined Date</th>
                             </tr>
                         </thead>
@@ -76,7 +75,7 @@
                     <h4 class="font-medium text-gray-600">Abhi koi lead data nahi hai</h4>
                 </div>
 
-                <!-- Modern Pagination Controls (Bootstrap styled inside Tailwind) -->
+                <!-- Modern Pagination Controls -->
                 <div id="pagination-wrapper" class="flex items-center justify-between border-t border-gray-100 px-6 py-4 bg-gray-50/50">
                     <span class="text-xs text-gray-500" id="pagination-status">Showing 0 to 0 of 0 entries</span>
                     <nav aria-label="Page navigation">
@@ -93,8 +92,7 @@
     <!-- JS Script Connection -->
     <script type="module" src="./js/adminshwolead.js"></script>
     <script type="module" src="./js/admin-core.js"></script>
-    <!-- <script type="module" src="./js/adminAuth.js"></script> -->
-     <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/auth.js"></script>
    
 </body>
 </html>

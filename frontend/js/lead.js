@@ -28,9 +28,7 @@ async function ensureLeadModalIsLoaded() {
     }
 }
 
-// ==========================================
 // 1. OPEN & CLOSE MODAL FUNCTIONS
-// ==========================================
 window.openLeadModal = async function(actionElement) {
     pendingCartAction = actionElement;
     let modal = document.getElementById('leadModal');
@@ -49,16 +47,13 @@ window.closeLeadModal = function() {
     const modal = document.getElementById('leadModal');
     if (modal) {
         modal.classList.add('hidden');
-        modal.style.display = 'none'; // Extra safety fallback
+        modal.style.display = 'none';
     }
     pendingCartAction = null;
 };
 
-// ==========================================
-// 2. GLOBAL EVENT DELEGATION (CROSS BUTTON & OVERLAY CLICK)
-// ==========================================
+// 2. GLOBAL EVENT DELEGATION
 document.addEventListener('click', (event) => {
-    // A) Check if Cross (×) button was clicked
     const isCloseBtn = event.target.closest('#closeLeadModal') || 
                        event.target.closest('.close-modal-btn') || 
                        event.target.innerText === '×' || 
@@ -71,23 +66,19 @@ document.addEventListener('click', (event) => {
         return;
     }
 
-    // B) Check if clicked on Dark Backdrop Overlay outside the form
     const modal = document.getElementById('leadModal');
     if (modal && event.target === modal) {
         window.closeLeadModal();
     }
 });
 
-// ESC Key shortcut to close lead modal
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         window.closeLeadModal();
     }
 });
 
-// ==========================================
 // 3. CART BUTTON HANDLER LOGIC
-// ==========================================
 window.handleCartButtonClick = function(buttonElement) {
     const isLeadFilled = localStorage.getItem('leadFilled');
     
@@ -104,22 +95,26 @@ window.handleCartButtonClick = function(buttonElement) {
     }
 };
 
-// ==========================================
-// 4. LEAD FORM SUBMISSION
-// ==========================================
+// 4. LEAD FORM SUBMISSION (Only Name & Email)
 window.handleLeadSubmit = async function(event) {
     event.preventDefault();
     
-    const name = document.getElementById('leadName')?.value;
-    const email = document.getElementById('leadEmail')?.value;
-    const phone = document.getElementById('leadPhone')?.value;
-    const address = document.getElementById('leadAddress')?.value;
+    const name = document.getElementById('leadName')?.value?.trim();
+    const email = document.getElementById('leadEmail')?.value?.trim();
+
+    if (!name || !email) {
+        alert("Kripya Name aur Email fill karein.");
+        return;
+    }
 
     try {
         const response = await fetch(`${BASE_URL}/api/lead/newlead`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, phone, address })
+            body: JSON.stringify({
+                name,
+                email
+            })
         });
 
         const data = await response.json();

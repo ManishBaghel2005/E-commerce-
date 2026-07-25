@@ -1,26 +1,22 @@
 import Lead from '../models/lead.models.js';
 
+// 1. New Lead Save Karna (Only Name & Email)
 export const createLead = async (req, res) => {
     try {
-        const { name, email, phone, address } = req.body;
+        const { name, email } = req.body;
 
         // Validation checking
-        if (!name || !email || !phone || !address) {
-            return res.status(400).json({ error: "Sabhi fields fill karna zaroori hai!" });
+        if (!name || !email) {
+            return res.status(400).json({ error: "Name aur Email dono fill karna zaroori hai!" });
         }
-        // Phone Number Validation
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phoneRegex.test(phone)) {
-    return res.status(400).json({ error: "Invalid Indian phone number! Exactly 10 digits required starting with 6-9." });
-    }
 
-        // Email format check (optional but good practice)
+        // Email format check
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ error: "Valid email address enter karein!" });
         }
 
-        const newLead = new Lead({ name, email, phone, address });
+        const newLead = new Lead({ name, email });
         await newLead.save();
 
         res.status(201).json({ success: true, message: "Lead successfully saved!" });
@@ -30,11 +26,10 @@ export const createLead = async (req, res) => {
     }
 };
 
-
-// 2. Admin Panel par saari Leads show karne ke liye
+// 2. Admin Panel par saari Leads fetch karna
 export const getAllLeads = async (req, res) => {
     try {
-        const leads = await Lead.find().sort({ createdAt: -1 }); // Latest leads pehle aayengi
+        const leads = await Lead.find().sort({ createdAt: -1 });
         res.status(200).json({ 
             success: true, 
             data: leads 

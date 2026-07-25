@@ -235,43 +235,52 @@
 <div id="navbar-placeholder"></div>
 
 
-<div class="flex w-full h-[22vh] md:h-[60vh] overflow-hidden relative group">
-   <button id="prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-ink w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100">
-        <i class="fa-solid fa-angle-left text-lg"></i>
+<div class="flex w-full overflow-hidden relative group aspect-[16/7] md:aspect-[21/9] lg:h-[60vh]">
+    
+    <!-- Prev Button -->
+    <button id="prev-btn" aria-label="Previous Slide" 
+        class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-800 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-70 group-hover:opacity-100 active:scale-95">
+        <i class="fa-solid fa-angle-left text-sm md:text-lg"></i>
     </button>
-    <button id="next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-ink w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"><i class="fa-solid fa-angle-right"></i></button>
     
-   <div id="slider-track" class="flex w-full h-full transition-transform duration-700 ease-in-out">
+    <!-- Next Button -->
+    <button id="next-btn" aria-label="Next Slide" 
+        class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-800 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-70 group-hover:opacity-100 active:scale-95">
+        <i class="fa-solid fa-angle-right text-sm md:text-lg"></i>
+    </button>
     
-    <a href="./moreproduct.html" class="w-full shrink-0 block ">
-        <img src="./static/alora6.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
-
-    <a href="./moreproduct.html" class="w-full shrink-0 block">
-        <img src="./static/fullbanner.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
+    <!-- Slider Track -->
+    <div id="slider-track" class="flex w-full h-full transition-transform duration-700 ease-in-out">
     
-    <a href="./moreproduct.html" class="w-full shrink-0 block">
-        <img src="./static/alora2.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/alora6.webp" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
 
-    <a href="./moreproduct.html" class="w-full shrink-0 block">
-        <img src="./static/alora3.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/aloraproductimage.jpeg" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
+        
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/alora2.webp" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
 
-    <a href="./moreproduct.html" class="w-full shrink-0 block">
-        <img src="./static/alora4.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/alora3.webp" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
 
-    <a href="./moreproduct.html" class="w-full shrink-0 block">
-        <img src="./static/alora5.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/alora4.webp" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
 
-    <a href="./moreproduct.html" class="w-full shrink-0 block">
-        <img src="./static/alora1.webp" alt="" class="w-full h-[22vh] md:h-[60vh] object-cover">
-    </a>
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/alora5.webp" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
 
-</div>
+        <a href="./moreproduct.html" class="w-full shrink-0 block h-full">
+            <img src="./static/alora1.webp" alt="Banner Image" class="w-full h-full object-fill md:object-cover">
+        </a>
+
+    </div>
 </div>
 
  <!-- ============ FEATURED PRODUCTS ============ -->
@@ -299,57 +308,77 @@
     </section>
 
     <!-- ============ HERO ============ -->
-    <header class="max-w-7xl mx-auto px-4 py-14 md:py-20 grid gap-8 md:grid-cols-2 md:gap-12 items-center">
-        <div class="animate__animated animate__fadeInLeft pl-0 md:pl-8 flex flex-col items-center md:items-start hero-copy">
-           
-            <h1 class="text-4xl md:text-6xl font-robot font-medium text-ink leading-[1.08] mb-6">
-             Glow More. Save More.<br>
-            </h1>
-            <p class="text-[#5C594E] text-base mb-8 max-w-md leading-relaxed"> Bundle your favourites and enjoy a complete skincare routine while unlocking exclusive savings. Build a complete skincare routine with our specially curated combo packs. Each set combines complementary products to cleanse, nourish, protect, and reveal healthy, radiant skin.
-tagline - Bundle Up Your Glow.</p>
-            <div class="flex items-center gap-6 hero-actions">
-                <a href="./moreproduct.html"  class="bg-clay text-parchment px-7 py-3.5 rounded-md shadow-sm hover:bg-ink-light transition tracking-wide text-sm font-semibold">Explore More</a>
-                <a href="#featured" class="text-sm font-semibold text-ink border-b-2 border-clay pb-1 hover:text-clay transition">Bestsellers</a>
-            </div>
-            <div class="flex items-center justify-center md:justify-start gap-4 md:gap-8 mt-10 pt-8 border-t border-[#DDD4BC] hero-stats flex-wrap">
-                <div>
-                    <p class="text-sm font-robot text-ash  uppercase tracking-widest">Premium Ingredients</p>
-                </div>
-                <div class="w-px h-8 bg-[#DDD4BC]"></div>
-                <div>
-                    <p class="text-sm font-sans text-ash  uppercase tracking-widest">Recyclable Packaging</p>
-                </div>
-                <div class="w-px h-8 bg-[#DDD4BC]"></div>
-                <div>
-                    <p class="text-2xl font-robot text-ink">4.8/5</p>
-                    <p class="text-[11px] uppercase tracking-widest text-ash">Customer rated</p>
-                </div>
-            </div>
-        </div>
-        <div class="animate__animated animate__fadeInRight flex justify-center">
-    <div class="relative bg-white p-3 rounded-2xl shadow-xl border border-[#EAE3CF] w-full max-w-md overflow-hidden">
+  <header class="max-w-7xl mx-auto px-4 py-10 md:py-20 grid gap-8 md:grid-cols-2 md:gap-12 items-center">
+    
+    <!-- Left Hero Copy -->
+    <div class="animate__animated animate__fadeInLeft pl-0 md:pl-8 flex flex-col items-center md:items-start text-center md:text-left hero-copy">
         
-        <!-- Main dynamic snapping slider layout container -->
-        <div id="auto-slider" class="bg-sage-light rounded-xl p-6 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-10 no-scrollbar">
+        <h1 class="text-3xl sm:text-4xl md:text-6xl font-robot font-medium text-ink leading-[1.1] mb-6">
+            Glow More<br> Save More.<br>
+        </h1>
+        
+        <p class="text-[#5C594E] text-sm md:text-base mb-8 max-w-md leading-relaxed">
+            Bundle your favourites and enjoy a complete skincare routine while unlocking exclusive savings. Build a complete skincare routine with our specially curated combo packs. Each set combines complementary products to cleanse, nourish, protect, and reveal healthy, radiant skin.<br>
+            <span class="font-semibold text-clay block mt-2">Bundle Up Your Glow.</span>
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex items-center gap-4 sm:gap-6 hero-actions">
+            <a href="./moreproduct.html" class="bg-clay text-parchment px-6 sm:px-7 py-3 sm:py-3.5 rounded-md shadow-sm hover:bg-ink-light transition tracking-wide text-xs sm:text-sm font-semibold">Explore More</a>
+            <a href="#featured" class="text-xs sm:text-sm font-semibold text-ink border-b-2 border-clay pb-1 hover:text-clay transition">Bestsellers</a>
+        </div>
+
+        <!-- Hero Stats (Aligned Single Row on Desktop & Responsive Wrap on Mobile) -->
+        <div class="flex items-center justify-center md:justify-start gap-3 sm:gap-6 md:gap-8 mt-10 pt-8 border-t border-[#DDD4BC] hero-stats w-full">
             
-            <!-- FIXED: w-full, flex-shrink-0, and snap-center moved onto the <a> tags -->
-            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
-                <img src="./static/combo1.webp" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
-            </a>
-            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
-                <img src="./static/combo2.webp" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
-            </a>
-            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
-                <img src="./static/combo3.webp" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
-            </a>
-            <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
-                <img src="./static/combo4.webp" alt="Alora" class="w-full h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-500">
-            </a>
+            <!-- Stat 1 -->
+            <div class="flex items-center">
+                <p class="text-[11px] sm:text-xs md:text-sm font-robot text-ash uppercase tracking-widest font-semibold">Premium<br class="hidden sm:block"> Ingredients</p>
+            </div>
             
+            <div class="w-px h-8 bg-[#DDD4BC] shrink-0"></div>
+            
+            <!-- Stat 2 -->
+            <div class="flex items-center">
+                <p class="text-[11px] sm:text-xs md:text-sm font-sans text-ash uppercase tracking-widest font-semibold">Recyclable<br class="hidden sm:block"> Packaging</p>
+            </div>
+            
+            <div class="w-px h-8 bg-[#DDD4BC] shrink-0"></div>
+            
+            <!-- Stat 3 (Now aligned on the right side in the same row) -->
+            <div class="flex flex-col justify-center text-left">
+                <p class="text-xl sm:text-2xl font-robot text-ink font-bold leading-none">4.8/5</p>
+                <p class="text-[9px] sm:text-[11px] uppercase tracking-widest text-ash mt-1 whitespace-nowrap">Customer rated</p>
+            </div>
+
         </div>
     </div>
-</div>
-    </header>
+
+    <!-- Right Slider Container -->
+    <div class="animate__animated animate__fadeInRight flex justify-center w-full">
+        <div class="relative bg-white p-2.5 sm:p-3 rounded-2xl shadow-xl border border-[#EAE3CF] w-full max-w-md overflow-hidden">
+            
+            <!-- Dynamic Auto Slider Track -->
+            <div id="auto-slider" class="bg-sage-light rounded-xl p-4 sm:p-6 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 sm:gap-10 no-scrollbar">
+                
+                <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                    <img src="./static/combo1.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                </a>
+                <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                    <img src="./static/combo2.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                </a>
+                <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                    <img src="./static/combo3.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                </a>
+                <a href="./moreproduct.html" class="w-full flex-shrink-0 snap-center block">
+                    <img src="./static/combo4.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+</header>
 
     <!-- ============ SHOP BY CATEGORY ============ -->
     <section class="max-w-7xl mx-auto px-4 pb-16 ">
@@ -621,42 +650,46 @@ tagline - Bundle Up Your Glow.</p>
     </section>
 
     <!-- =============Some Face image TO redirect ============= -->
-     <section class="p-5 max-w-7xl mx-auto">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+  <section class="p-5 max-w-7xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
         
+        <!-- Card 1: Uneven Tone -->
         <div class="flex flex-col group">
-            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
-                <div class="overflow-hidden rounded-lg mb-2">
-                    <img src="./static/before and after image.webp"  alt="Uneven Tone" class="w-full max-w-[288px] h-[120px] md:h-[216px] object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="./moreproduct.html" class="text-center block rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2.5 bg-gray-100 aspect-square w-full">
+                    <img src="./static/before and after image.webp" alt="Uneven Tone" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-300 ease-in-out">
                 </div>
-                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Uneven Tone</span>
+                <span class="font-medium text-xs sm:text-base text-black/85 group-hover:text-gold transition-colors duration-200 block">Uneven Tone</span>
             </a>
         </div>
 
+        <!-- Card 2: Acne control -->
         <div class="flex flex-col group">
-            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
-                <div class="overflow-hidden rounded-lg mb-2">
-                    <img src="./static/faceskin2.webp" alt="Acne control" class="w-full h-auto object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="./moreproduct.html" class="text-center block rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2.5 bg-gray-100 aspect-square w-full">
+                    <img src="./static/faceskin2.webp" alt="Acne control" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-300 ease-in-out">
                 </div>
-                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Acne control</span>
+                <span class="font-medium text-xs sm:text-base text-black/85 group-hover:text-gold transition-colors duration-200 block">Acne control</span>
             </a>
         </div>
 
+        <!-- Card 3: Oiliness -->
         <div class="flex flex-col group">
-            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
-                <div class="overflow-hidden rounded-lg mb-2">
-                    <img src="./static/faceskin3.webp" alt="Oiliness" class="w-full h-auto object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="./moreproduct.html" class="text-center block rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2.5 bg-gray-100 aspect-square w-full">
+                    <img src="./static/faceskin3.webp" alt="Oiliness" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-300 ease-in-out">
                 </div>
-                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Oiliness</span>
+                <span class="font-medium text-xs sm:text-base text-black/85 group-hover:text-gold transition-colors duration-200 block">Oiliness</span>
             </a>
         </div>
 
+        <!-- Card 4: Wrinkles -->
         <div class="flex flex-col group">
-            <a href="./moreproduct.html" class="text-center block overflow-hidden rounded-lg">
-                <div class="overflow-hidden rounded-lg mb-2">
-                    <img src="./static/faceskin4.webp" alt="Wrinkles" class="w-full h-auto object-cover transform hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="./moreproduct.html" class="text-center block rounded-lg">
+                <div class="overflow-hidden rounded-lg mb-2.5 bg-gray-100 aspect-square w-full">
+                    <img src="./static/faceskin4.webp" alt="Wrinkles" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-300 ease-in-out">
                 </div>
-                <span class="font-medium text-black/85 group-hover:text-gold transition-colors duration-200">Wrinkles</span>
+                <span class="font-medium text-xs sm:text-base text-black/85 group-hover:text-gold transition-colors duration-200 block">Wrinkles</span>
             </a>
         </div>
 
@@ -664,34 +697,47 @@ tagline - Bundle Up Your Glow.</p>
 </section>
 
     <!-- ============ OUR STORY ============ -->
-    <section class="bg-white py-20 border-b border-[#E7DFC7]">
-        <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-14 items-center">
-            <div class="relative bg-sage-light rounded-2xl p-12 label-perforation flex items-center justify-center h-80 md:h-96">
-              <img src="./static/Founder.webp"  class="h-80 md:h-96 shrink-0 w-full hover:scale-110 transition-transform duration-300" alt="Founder Logo">
-            </div>
-            <div>
-                <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-3">Our Story</p>
-                <h2 class="text-3xl font-robot  font-medium text-ink mb-5 leading-tight">Meet Our Founder</h2>
-                <p class="text-sm text-[#5C594E] leading-relaxed mb-4">
-                   At Alora Radiance, our story begins with Gurpreet Singh and a refined belief: skincare should feel honest, effective, and undeniably luxurious—without ever feeling complicated.
+   <section class="bg-white py-12 md:py-20 border-b border-[#E7DFC7]">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-8 md:gap-14 items-center">
+        
+        <!-- Image Container -->
+        <div class="relative bg-sage-light rounded-2xl p-4 sm:p-6 md:p-8 label-perforation flex items-center justify-center w-full min-h-[300px] sm:min-h-[380px] md:min-h-[450px]">
+            <img src="./static/Founder.webp" 
+                 class="w-full max-w-[280px] sm:max-w-[340px] md:max-w-full h-auto max-h-[380px] md:max-h-[420px] object-contain rounded-xl hover:scale-105 transition-transform duration-300 drop-shadow-sm" 
+                 alt="Founder Logo">
+        </div>
+
+        <!-- Content Area -->
+        <div class="text-left">
+            <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2 md:mb-3">Our Story</p>
+            <h2 class="text-2xl sm:text-3xl font-robot font-medium text-ink mb-4 md:mb-5 leading-tight">Meet Our Founder</h2>
+            
+            <div class="space-y-4 text-sm text-[#5C594E] leading-relaxed mb-6">
+                <p>
+                    At Alora Radiance, our story begins with Gurpreet Singh and a refined belief: skincare should feel honest, effective, and undeniably luxurious—without ever feeling complicated.
                 </p>
-                <p class="text-sm text-[#5C594E] leading-relaxed mb-6">
+                <p>
                     Gurpreet Singh recognized a gap in the market: many skincare products made bold promises, yet few delivered the elevated results and experience discerning customers expect. He set out to create a brand defined by trust, exceptional quality, and thoughtfully crafted formulations—one that would offer more than skincare, but a truly premium ritual. That vision became Alora Radiance.
                 </p>
-                <p class="text-sm text-[#5C594E] leading-relaxed mb-6">
+                <p>
                     What began as an idea soon evolved into a mission to create sophisticated skincare that integrates seamlessly into daily routines while still feeling exclusive, indulgent, and elevated. From the very beginning, every product has been developed with a commitment to transparency, performance, and a luxurious customer experience.
                 </p>
-                <p class="text-sm text-[#5C594E] leading-relaxed mb-6">
+                <p>
                     Today, Alora Radiance continues to grow with the same purpose that inspired its beginning: to bring high-end skincare to customers across the UAE, India, and beyond.
                 </p>
-                <p class="text-sm text-[#5C594E] leading-relaxed mb-6">
-                   At Alora Radiance, every product reflects that journey—one shaped by trust, innovation, and the belief that radiant, healthy-looking skin deserves a truly premium experience.
+                <p>
+                    At Alora Radiance, every product reflects that journey—one shaped by trust, innovation, and the belief that radiant, healthy-looking skin deserves a truly premium experience.
                 </p>
-                <p class="font-robot  text-ink text-lg">– Gurpreet Singh
-Founder, Alora Radiance</p>
             </div>
+
+            <p class="font-robot text-ink text-base md:text-lg font-semibold">
+                – Gurpreet Singh<br>
+                <span class="text-xs md:text-sm font-normal text-[#5C594E]">Founder, Alora Radiance</span>
+            </p>
         </div>
-    </section>
+
+    </div>
+</section>
 
     <!-- ============ TESTIMONIALS ============ -->
     <section class="max-w-7xl mx-auto px-4 py-3 md:py-20 relative">
