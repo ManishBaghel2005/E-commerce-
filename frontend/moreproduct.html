@@ -53,10 +53,12 @@
                 <p class="text-[10px] font-bold tracking-[0.25em] uppercase text-clay">The Collection</p>
                 <h1 class="text-sm font-serif font-semibold text-ink -mt-0.5">Shop All Products</h1>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="applyQuickFilter('all')" class="text-xs font-semibold uppercase tracking-wide text-ash hover:text-ink px-3 py-1.5 rounded-full border border-transparent hover:border-[#E3D9BC] transition">View All</button>
-                <button onclick="applyQuickFilter('bestseller')" class="text-xs font-semibold uppercase tracking-wide text-ash hover:text-clay px-3 py-1.5 rounded-full border border-transparent hover:border-clay/30 transition"><i class="fa-solid fa-fire text-clay mr-1"></i>Bestsellers</button>
-            </div>
+          <div class="flex items-center gap-2">
+    <button onclick="applyQuickFilter('all', event)" class="text-xs font-semibold uppercase tracking-wide text-ash hover:text-ink px-3 py-1.5 rounded-full border border-transparent hover:border-[#E3D9BC] transition">View All</button>
+    <button onclick="applyQuickFilter('bestseller', event)" class="text-xs font-semibold uppercase tracking-wide text-ash hover:text-clay px-3 py-1.5 rounded-full border border-transparent hover:border-clay/30 transition">
+        <i class="fa-solid fa-fire text-clay mr-1"></i>Bestsellers
+    </button>
+</div>
         </div>
     </div>
 

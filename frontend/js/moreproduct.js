@@ -12,7 +12,31 @@ let pendingCatalogProductId = null;
 let pendingCatalogCartAction = null;
 
 // ===== Init =====
+// ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. URL Query Parameters check karein (?filter=bestseller YA ?category=body)
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterParam = urlParams.get('filter');
+    const categoryParam = urlParams.get('category');
+
+    // Handle Bestseller filter
+    if (filterParam === 'bestseller') {
+        activeQuickTag = 'bestseller';
+    }
+
+    // Handle Category filter (e.g. body, skin)
+    if (categoryParam) {
+        const cleanCategory = categoryParam.toLowerCase().trim();
+        selectedCategories = [cleanCategory];
+
+        // Sidebar Checkbox ko Auto-Check karein
+        const targetCheckbox = document.querySelector(`input[name="category"][value="${cleanCategory}"]`);
+        if (targetCheckbox) {
+            targetCheckbox.checked = true;
+        }
+    }
+
+    // 2. Load Products & Setup
     loadProductsFromBackend();
     syncCartCounterIcon();
     setupMobileMenu();
@@ -31,41 +55,76 @@ async function loadProductsFromBackend() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Failed to fetch products");
 
-        PRODUCTS_DATABASE = data.map(normalizeProduct);
-        renderProductCatalog(PRODUCTS_DATABASE);
+        PRODUCTS_DATABASE = normalizeAndAssignBestsellers(data);
+        
+        // ⚡ Update Quick Filter UI Buttons state if redirected from Index ⚡
+        updateQuickFilterUI();
+
+        // ⚡ Initial Filter Call (Respects URL query param) ⚡
+        filterProducts();
+
     } catch (err) {
         console.error("Product fetch failed:", err);
         gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10">Could not load products. Please try again later.</p>`;
     }
 }
 
-function normalizeProduct(product) {
-    const sizes = (product.variants && product.variants.length > 0)
-        ? product.variants.map(v => ({
-            ml: v.volume || "Standard",
-            price: v.price || 0,
-            mrp: v.comparePrice || v.price || 0
-          }))
-        : [{ ml: "Standard", price: product.price || 0, mrp: product.comparePrice || product.price || 0 }];
+// Normalize DB structure & Smartly Handle Bestsellers from Frontend
+function normalizeAndAssignBestsellers(rawProducts) {
+    let normalized = rawProducts.map(product => {
+        const sizes = (product.variants && product.variants.length > 0)
+            ? product.variants.map(v => ({
+                ml: v.volume || "Standard",
+                price: v.price || 0,
+                mrp: v.comparePrice || v.price || 0
+              }))
+            : [{ ml: "Standard", price: product.price || 0, mrp: product.comparePrice || product.price || 0 }];
 
-    let rawCategory = (product.category || "uncategorized").toLowerCase().trim();
-    if (rawCategory === 'skincare') rawCategory = 'skin';
-    if (rawCategory === 'bodycare') rawCategory = 'body';
+        let rawCategory = (product.category || "uncategorized").toLowerCase().trim();
+        if (rawCategory === 'skincare') rawCategory = 'skin';
+        if (rawCategory === 'bodycare') rawCategory = 'body';
 
-    const imageSrc = product.imagepath 
-        ? (product.imagepath.startsWith('http') ? product.imagepath : `${BASE_URL}${product.imagepath}`) 
-        : '';
+        const imageSrc = product.imagepath 
+            ? (product.imagepath.startsWith('http') ? product.imagepath : `${BASE_URL}${product.imagepath}`) 
+            : '';
 
-    return {
-        id: product._id || product.id,
-        name: product.name || 'Untitled Product',
-        category: rawCategory, 
-        isBestseller: !!product.isBestseller,
-        rating: product.rating || 4,
-        baseImg: imageSrc,
-        description: product.description || 'No description available', 
-        sizes
-    };
+        const backendIsBestseller = Boolean(
+            product.isBestseller === true || 
+            product.isBestseller === 'true' || 
+            product.bestseller === true || 
+            product.bestseller === 'true'
+        );
+
+        return {
+            id: product._id || product.id,
+            name: product.name || 'Untitled Product',
+            category: rawCategory, 
+            isBestseller: backendIsBestseller,
+            rating: product.rating || 4,
+            baseImg: imageSrc,
+            description: product.description || 'No description available', 
+            sizes
+        };
+    });
+
+    // ⚡ FRONTEND BESTSELLER FALLBACK LOGIC ⚡
+    const hasAnyBackendBestseller = normalized.some(p => p.isBestseller);
+
+    if (!hasAnyBackendBestseller && normalized.length > 0) {
+        // Sort copy by rating (highest first)
+        const sortedIndices = [...normalized]
+            .map((p, idx) => ({ idx, rating: p.rating }))
+            .sort((a, b) => b.rating - a.rating);
+
+        const bestsellerCount = Math.max(2, Math.min(6, Math.ceil(normalized.length * 0.3)));
+        
+        for (let i = 0; i < Math.min(bestsellerCount, normalized.length); i++) {
+            const targetIdx = sortedIndices[i].idx;
+            normalized[targetIdx].isBestseller = true;
+        }
+    }
+
+    return normalized;
 }
 
 // ===== Render Catalog =====
@@ -220,8 +279,13 @@ function filterProducts() {
         if (selectedCategories.length > 0 && !selectedCategories.includes(item.category)) {
             return false;
         }
+
         if (item.rating < ratingFloorFilter) return false;
-        if (activeQuickTag === 'bestseller' && !item.isBestseller) return false;
+
+        // ⚡ BESTSELLER QUICK TAG FILTER ⚡
+        if (activeQuickTag === 'bestseller' && !item.isBestseller) {
+            return false;
+        }
 
         const basePrice = item.sizes[0].price;
         if (basePrice > maxPriceConstraint) return false;
@@ -229,6 +293,7 @@ function filterProducts() {
         return true;
     });
 
+    // Sort Results
     const sortFilter = document.getElementById('sort-filter');
     if (sortFilter) {
         const sortSelection = sortFilter.value;
@@ -244,9 +309,59 @@ function filterProducts() {
     renderProductCatalog(results);
 }
 
-// 🔍 Search Listener Setup
-// Replace your setupSearchListeners inside `moreproduct.js` with this:
+// Sync UI Active state for Quick Filters
+function updateQuickFilterUI() {
+    const bestsellerBadge = document.getElementById('badge-bestseller');
+    if (bestsellerBadge) {
+        if (activeQuickTag === 'bestseller') bestsellerBadge.classList.remove('hidden');
+        else bestsellerBadge.classList.add('hidden');
+    }
 
+    const buttons = document.querySelectorAll('[onclick*="applyQuickFilter"]');
+    buttons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(activeQuickTag)) {
+            btn.classList.add('border-[#E3D9BC]', 'bg-clay/10', 'font-bold');
+        } else {
+            btn.classList.remove('border-[#E3D9BC]', 'bg-clay/10', 'font-bold');
+        }
+    });
+}
+
+function applyQuickFilter(mode) {
+    activeQuickTag = mode;
+    updateQuickFilterUI();
+    filterProducts();
+}
+
+function updatePriceLabel(value) {
+    const label = document.getElementById('price-max-label');
+    if (label) label.innerText = `₹${value}`;
+}
+
+function setRatingFilter(minStars) {
+    ratingFloorFilter = minStars;
+    filterProducts();
+}
+
+function resetFilters() {
+    document.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = false);
+    const range = document.getElementById('price-range');
+    if (range) range.value = 1500;
+    const sort = document.getElementById('sort-filter');
+    if (sort) sort.value = 'featured';
+    
+    updatePriceLabel(1500);
+    ratingFloorFilter = 0;
+    activeQuickTag = 'all';
+    searchQuery = '';
+    
+    document.querySelectorAll('#search-input, .search-bar').forEach(input => input.value = '');
+
+    updateQuickFilterUI();
+    filterProducts();
+}
+
+// ===== Search Listeners & Suggestions =====
 function setupSearchListeners() {
     document.addEventListener('input', async (e) => {
         const input = e.target;
@@ -257,20 +372,15 @@ function setupSearchListeners() {
         const query = input.value.toLowerCase().trim();
         searchQuery = query;
 
-        // 1. Live-filter the products grid on moreproduct.html
         filterProducts();
-
-        // 2. Fetch and show the suggestion dropdown (just like Blog.html & other pages)
         await fetchAndShowSuggestions(query);
     });
 }
 
-// Helper to render backend suggestions dropdown under the search bar
 async function fetchAndShowSuggestions(query) {
     const searchContainer = document.getElementById('search-container');
     if (!searchContainer) return;
 
-    // Look for or create the suggestions container div
     let suggestionsBox = document.getElementById('search-suggestions-box');
     if (!suggestionsBox) {
         suggestionsBox = document.createElement('div');
@@ -286,13 +396,11 @@ async function fetchAndShowSuggestions(query) {
     }
 
     try {
-        // Fetch matching products from backend API
         const response = await fetch(`${BASE_URL}/api/product/all`);
         const data = await response.json();
 
         if (!response.ok) return;
 
-        // Filter results matching search query
         const matches = data.filter(item => {
             const name = (item.name || '').toLowerCase();
             const cat = (item.category || '').toLowerCase();
@@ -305,7 +413,6 @@ async function fetchAndShowSuggestions(query) {
             return;
         }
 
-        // Render matching suggestion items with images and titles
         suggestionsBox.innerHTML = matches.map(prod => {
             const imgSrc = prod.imagepath 
                 ? (prod.imagepath.startsWith('http') ? prod.imagepath : `${BASE_URL}${prod.imagepath}`) 
@@ -328,47 +435,6 @@ async function fetchAndShowSuggestions(query) {
     } catch (err) {
         console.error("Error fetching suggestions:", err);
     }
-}
-
-function updatePriceLabel(value) {
-    const label = document.getElementById('price-max-label');
-    if (label) label.innerText = `₹${value}`;
-}
-
-function setRatingFilter(minStars) {
-    ratingFloorFilter = minStars;
-    filterProducts();
-}
-
-function applyQuickFilter(mode) {
-    activeQuickTag = mode;
-    const bestsellerBadge = document.getElementById('badge-bestseller');
-
-    if (bestsellerBadge) {
-        if (mode === 'bestseller') bestsellerBadge.classList.remove('hidden');
-        else bestsellerBadge.classList.add('hidden');
-    }
-    filterProducts();
-}
-
-function resetFilters() {
-    document.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = false);
-    const range = document.getElementById('price-range');
-    if (range) range.value = 1500;
-    const sort = document.getElementById('sort-filter');
-    if (sort) sort.value = 'featured';
-    
-    updatePriceLabel(1500);
-    ratingFloorFilter = 0;
-    activeQuickTag = 'all';
-    searchQuery = '';
-    
-    document.querySelectorAll('#search-input, .search-bar').forEach(input => input.value = '');
-
-    const bestsellerBadge = document.getElementById('badge-bestseller');
-    if (bestsellerBadge) bestsellerBadge.classList.add('hidden');
-
-    filterProducts();
 }
 
 // ===== Cart Interceptor & Lead Flow =====
@@ -432,10 +498,10 @@ function commitProductToCart(productId, actionBtnElement) {
     localStorage.setItem('glowRitualCartData', JSON.stringify(localCartArr));
     document.dispatchEvent(new Event('cartUpdated'));
 
-    // Update navbar and local counters immediately (robust fallback)
     const primary = JSON.parse(localStorage.getItem('glowCart') || '[]');
     const legacy = JSON.parse(localStorage.getItem('glowRitualCartData') || '[]');
     const total = (Array.isArray(primary) && primary.length > 0 ? primary : legacy).reduce((t, it) => t + (parseInt(it.qty || it.qtyCountOrderMetric || 0) || 0), 0);
+    
     document.querySelectorAll('#global-cart-badge, .cart-badge, #cart-count').forEach(b => { if (b) b.innerText = String(total); });
     localStorage.setItem('cartCount', String(total));
 
@@ -460,7 +526,6 @@ function commitProductToCart(productId, actionBtnElement) {
 function syncCartCounterIcon() {
     const countDisplay = document.getElementById('cart-count');
 
-    // Prefer canonical glowCart (used by main.js and product.js), fallback to legacy glowRitualCartData
     let netSum = 0;
     try {
         const primary = JSON.parse(localStorage.getItem('glowCart') || '[]');
@@ -481,16 +546,13 @@ function syncCartCounterIcon() {
     localStorage.setItem('cartCount', String(netSum));
 }
 
-// Live update when other pages dispatch cartUpdated
 document.addEventListener('cartUpdated', () => {
     try { syncCartCounterIcon(); } catch (e) { console.warn('cartUpdated handler failed', e); }
 });
 
-// ===== Robust Mobile Menu Helper =====
-// ===== Robust Mobile Menu Helper for Tailwind Slide Drawer =====
+// ===== Mobile Menu Helper =====
 function setupMobileMenu() {
     document.addEventListener("click", (e) => {
-        // Handle Open / Close Button Clicks
         const menuBtn = e.target.closest("#menu-btn") || e.target.closest(".mobile-menu-toggle");
         const closeBtn = e.target.closest("#menu-close-btn");
         const mobileMenu = document.getElementById("mobile-menu");
@@ -498,7 +560,6 @@ function setupMobileMenu() {
 
         if (!mobileMenu) return;
 
-        // Open Menu Action
         if (menuBtn) {
             e.preventDefault();
             mobileMenu.classList.remove("hidden", "pointer-events-none", "opacity-0");
@@ -508,7 +569,6 @@ function setupMobileMenu() {
             return;
         }
 
-        // Close Menu Action (Click on 'X' or Backdrop Overlay)
         if (closeBtn || e.target === mobileMenu) {
             e.preventDefault();
             if (mobileDrawer) {
@@ -523,14 +583,8 @@ function setupMobileMenu() {
     });
 }
 
-// ========================================================
-// 🔍 SELF-CONTAINED SEARCH HANDLER FOR MOREPRODUCT.JS ONLY
-// (Safe: Does not touch include.js or navbar.html)
-// ========================================================
-
-// 1. Toggle Search Overlay (Open / Close)
+// ===== Search Overlay Toggle =====
 document.addEventListener('click', (e) => {
-    // Check if clicked element is the search icon/button
     const openBtn = e.target.closest('#search-open-btn');
     if (openBtn) {
         e.preventDefault();
@@ -543,7 +597,6 @@ document.addEventListener('click', (e) => {
         return;
     }
 
-    // Check if clicked element is the search close button ('X')
     const closeBtn = e.target.closest('#search-close-btn');
     if (closeBtn) {
         e.preventDefault();
@@ -555,15 +608,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 2. Real-time Product Filtering on Typing
-document.addEventListener('input', (e) => {
-    if (e.target && e.target.id === 'search-input') {
-        searchQuery = e.target.value.toLowerCase().trim();
-        filterProducts(); // Calls your existing filter function
-    }
-});
-
-// Expose Global Window References
+// ===== Expose Global Functions for Inline HTML Event Listeners =====
 window.changeCardSize = changeCardSize;
 window.updateQty = updateQty;
 window.filterProducts = filterProducts;
@@ -574,11 +619,9 @@ window.resetFilters = resetFilters;
 window.commitProductToCart = commitProductToCart;
 window.handleCartButtonClick = handleCartButtonClick;
 
-// When partials (navbar) are injected, ensure the navbar badge shows current cart state
 document.addEventListener('partialsLoaded', () => {
     try { syncCartCounterIcon(); } catch (e) { console.warn('partialsLoaded sync failed', e); }
     if (typeof window.updateHeaderCartCount === 'function') {
         try { window.updateHeaderCartCount(); } catch (e) { console.warn('updateHeaderCartCount failed', e); }
     }
 });
-
