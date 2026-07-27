@@ -7,4 +7,6 @@ const BASE_URL = isLocal
     ? "http://localhost:5000"
     : PRODUCTION_BACKEND_URL;
 
+export const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyyeLQYUdCrT8FxwDNLv-wVGF_YfC4aK4G4g4g2rRnWvtqeJeySVghAUFF1eN_atdnk/exec";
+
 export default BASE_URL;

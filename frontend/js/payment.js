@@ -1,11 +1,33 @@
 import BASE_URL from './config.js';
 
+// Helper: Cart read karne ke liye safe function (Matches cart.js logic)
+function getSafeCart() {
+    try {
+        const primary = localStorage.getItem("glowCart");
+        if (primary) return JSON.parse(primary);
+        const legacy = localStorage.getItem("glowRitualCartData");
+        if (legacy) return JSON.parse(legacy);
+        return [];
+    } catch (e) {
+        return [];
+    }
+}
+
+// Helper: Cart ko fully clear karne ke liye
+function clearAllCart() {
+    localStorage.removeItem("glowCart");
+    localStorage.removeItem("glowRitualCartData");
+    if (typeof window.updateHeaderCartCount === "function") {
+        window.updateHeaderCartCount();
+    }
+}
+
 const button = document.getElementById("payNow");
 
 button?.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    // 1. HTML Form se Delivery Details fetch karein
+    // 1. Delivery Details Fetching
     const nameInput = document.getElementById("custName");
     const phoneInput = document.getElementById("custPhone");
     const addressInput = document.getElementById("custAddress");
@@ -23,17 +45,20 @@ button?.addEventListener("click", async (e) => {
         return;
     }
 
-    // Phone number validation (10 digits)
     if (phone.length !== 10 || isNaN(phone)) {
         alert("Kripya valid 10-digit mobile number dalein!");
         phoneInput.focus();
         return;
     }
 
-    // 3. Cart items extract karein
-    const cartItems = JSON.parse(localStorage.getItem("glowCart") || "[]");
+    // 3. Cart Items Extract (Safe Method)
+    const cartItems = getSafeCart();
+    if (cartItems.length === 0) {
+        alert("Aapki cart khali hai! Kripya pehle product add karein.");
+        return;
+    }
 
-    // 4. Total Amount calculate/extract karein
+    // 4. Total Amount Calculate
     const billTotalElement = document.getElementById("bill-total");
     if (!billTotalElement) {
         alert("Bill Total Element nahi mila!");
@@ -49,17 +74,13 @@ button?.addEventListener("click", async (e) => {
     }
 
     try {
-        // 5. Backend ko Call lagayein aur Order Create karein
+        // 5. Create Order API Call
         const response = await fetch(`${BASE_URL}/api/payments/create-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
                 amount: payamount,
-                notes: {
-                    address: address,
-                    phone: phone,
-                    name: name
-                }
+                notes: { address, phone, name }
             })
         });
 
@@ -70,7 +91,7 @@ button?.addEventListener("click", async (e) => {
             return;
         }
 
-        // 6. Razorpay Options Options Construct karein
+        // 6. Razorpay Configuration
         const options = {
             "key": orderData.razorpay_key_id,
             "amount": orderData.order.amount,
@@ -78,20 +99,16 @@ button?.addEventListener("click", async (e) => {
             "name": "ALORA PRODUCTS",
             "description": "Product Purchase",
             "order_id": orderData.order.id,
-
-            // Razorpay Dashboard me details save karne ke liye notes
             "notes": {
                 "shipping_address": address,
                 "customer_phone": phone,
                 "customer_name": name
             },
-
-            // Payment Handler Function
             "handler": async function (response) {
-                console.log("Payment Details: ", response);
+                console.log("Razorpay Response: ", response);
 
                 try {
-                    // Backend par verification call
+                    // Verification API Call
                     const verifyResponse = await fetch(`${BASE_URL}/api/payments/verify-payment`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -99,7 +116,6 @@ button?.addEventListener("click", async (e) => {
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature,
-                            // Extra Order Info for DB
                             customer: { name, phone, address },
                             cart: cartItems
                         })
@@ -108,10 +124,11 @@ button?.addEventListener("click", async (e) => {
                     const verificationResult = await verifyResponse.json();
 
                     if (verificationResult.status === "success") {
-                        // 🧹 Payment Success hone par CART EMPTY KAREIN
-                        localStorage.removeItem('glowCart');
+                        // Cart ko poori tarah clear karein
+                        clearAllCart();
 
-                        showPaymentSuccessPopup();
+                        // Success Popup dikhayein aur print invoice option dein
+                        showPaymentSuccessPopup(verificationResult.orderData);
                     } else {
                         alert("❌ Payment verification failed! Contact Support.");
                     }
@@ -120,8 +137,6 @@ button?.addEventListener("click", async (e) => {
                     alert("Verification API call fail ho gayi.");
                 }
             },
-            
-            // Customer Autofill in Razorpay Popup
             "prefill": {
                 "name": name,
                 "contact": phone
@@ -136,56 +151,112 @@ button?.addEventListener("click", async (e) => {
 
     } catch (error) {
         console.error("Error creating order: ", error);
-        alert("Connect failed! Backend server check karein.");
+        alert("Connection failed! Backend server check karein.");
     }
 });
 
-// Custom Success Popup Function
-function showPaymentSuccessPopup() {
+// Success Popup & Print Receipt Function
+function showPaymentSuccessPopup(orderInfo) {
     const modal = document.createElement('div');
     modal.id = 'payment-success-modal';
     modal.innerHTML = `
         <div style="
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999;
-            font-family: inherit;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; font-family: sans-serif;
         ">
             <div style="
-                background: #ffffff;
-                padding: 30px;
-                border-radius: 12px;
-                text-align: center;
-                max-width: 380px;
-                width: 85%;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                background: #ffffff; padding: 30px; border-radius: 12px;
+                text-align: center; max-width: 380px; width: 85%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             ">
                 <div style="font-size: 48px; margin-bottom: 12px;">🎉</div>
                 <h2 style="margin: 0 0 8px 0; color: #2e7d32; font-size: 22px;">Payment Successful!</h2>
-                <p style="color: #555; margin: 0 0 24px 0; font-size: 14px; line-height: 1.4;">
+                <p style="color: #555; margin: 0 0 20px 0; font-size: 14px; line-height: 1.4;">
                     Aapka order successfully place ho gaya hai.
                 </p>
+                <button id="download-receipt-btn" style="
+                    background-color: #2e7d32; color: white; border: none;
+                    padding: 10px 20px; font-size: 14px; border-radius: 6px; cursor: pointer;
+                    width: 100%; font-weight: 600; margin-bottom: 10px;
+                ">📄 Print / Download Receipt</button>
                 <button id="success-ok-btn" style="
-                    background-color: #A0522D;
-                    color: white;
-                    border: none;
-                    padding: 12px 24px;
-                    font-size: 15px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    width: 100%;
-                    font-weight: 600;
-                    transition: background-color 0.2s;
-                ">OK</button>
+                    background-color: #A0522D; color: white; border: none;
+                    padding: 12px 24px; font-size: 14px; border-radius: 6px; cursor: pointer;
+                    width: 100%; font-weight: 600;
+                ">Back to Store</button>
             </div>
         </div>
     `;
     
     document.body.appendChild(modal);
 
-    document.getElementById('success-ok-btn').addEventListener('click', function() {
+    document.getElementById('download-receipt-btn')?.addEventListener('click', function() {
+        printReceipt(orderInfo);
+    });
+
+    document.getElementById('success-ok-btn')?.addEventListener('click', function() {
         window.location.href = "./index.html";
     });
+}
+
+// Receipt Print Function
+function printReceipt(info) {
+    if (!info) return;
+    
+    const itemsRows = (info.cart || []).map((item, idx) => `
+        <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #eee;">${idx + 1}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name} (${item.size || 'Std'})</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price * item.qty}</td>
+        </tr>
+    `).join('');
+
+    const win = window.open('', '_blank');
+    win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Order Receipt - ${info.order_id}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                .box { max-width: 600px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+                .hdr { border-bottom: 2px solid #A0522D; padding-bottom: 10px; display: flex; justify-content: space-between; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th { background: #f5f5f5; text-align: left; padding: 8px; }
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <div class="hdr">
+                    <div>
+                        <h2 style="margin:0; color:#A0522D;">ALORA PRODUCTS</h2>
+                        <small>Purchase Receipt</small>
+                    </div>
+                    <div style="text-align:right;">
+                        <p style="margin:0;"><strong>Date:</strong> ${info.date || new Date().toLocaleDateString()}</p>
+                        <p style="margin:0;"><small>Order ID: ${info.order_id}</small></p>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <p style="margin: 3px 0;"><strong>Customer:</strong> ${info.customer?.name}</p>
+                    <p style="margin: 3px 0;"><strong>Phone:</strong> ${info.customer?.phone}</p>
+                    <p style="margin: 3px 0;"><strong>Address:</strong> ${info.customer?.address}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Product</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemsRows}</tbody>
+                </table>
+                <h3 style="text-align:right; margin-top: 20px;">Total Paid: ₹${info.amount}</h3>
+            </div>
+            <script>window.onload = function() { window.print(); }</script>
+        </body>
+        </html>
+    `);
+    win.document.close();
 }
