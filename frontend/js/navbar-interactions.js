@@ -1,5 +1,5 @@
 // js/navbar-interactions.js
-import BASE_URL from './config.js';
+import BASE_URL, { getImageUrl } from './config.js';
 
 // Global Event Delegation for Mobile Menu
 document.addEventListener('click', (e) => {
@@ -107,9 +107,7 @@ function initSearchFeature() {
 
                 if (data.success && data.products && data.products.length > 0 && suggestionsBox) {
                     suggestionsBox.innerHTML = data.products.map(product => {
-                        const imageSrc = product.imagepath 
-                            ? (product.imagepath.startsWith("http") ? product.imagepath : `${BASE_URL}${product.imagepath}`)
-                            : './static/placeholder.png';
+                        const imageSrc = getImageUrl(product.imagepath, './static/placeholder.png');
 
                         const finalPrice = product.price || product.discountprice || product.productPrice || 'N/A';
 

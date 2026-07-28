@@ -186,38 +186,43 @@
     }
 }
     </style>
+
+
 </head>
 <body class="bg-parchment font-sans text-[#2A2A24] antialiased">
 
     <!-- ============Pop Up ==================== -->
   
 
-    <div id="discountPopup" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 ease-out">
-        
-        <div id="popupBox" class="relative w-full max-w-md mx-4 bg-white p-8 rounded-2xl shadow-2xl text-center transform scale-95 transition-transform duration-300 ease-out">
+  <!-- Main Parent Overlay Wrapper with id="discountPopup" -->
+<div id="discountPopup" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300">
+    
+    <!-- Popup Card Box -->
+    <div id="popupBox" class="relative w-full max-w-md mx-4 bg-white p-8 rounded-2xl shadow-2xl text-center transform scale-95 transition-transform duration-300 ease-out">
             
-            <button id="closePopup" class="absolute top-4 right-4 text-gray-400 hover:text-[#2A2A24] text-2xl font-semibold p-1 transition-colors focus:outline-none" aria-label="Close popup">
-                &times;
-            </button>
+        <button id="closePopup" class="absolute top-4 right-4 text-gray-400 hover:text-[#2A2A24] text-2xl font-semibold p-1 transition-colors focus:outline-none" aria-label="Close popup">
+            &times;
+        </button>
 
-            <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-wider mb-5">
-                <span>🔥</span> Limited Offer
-            </div>
-
-            <h2 class="text-3xl font-extrabold tracking-tight mb-3">
-                Exclusive Deal!
-            </h2>
-
-            <p class="text-base leading-relaxed text-gray-600 mb-6">
-                Be one of the <span class="font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">First 100 Users</span> and grab a flat <span class="font-bold text-[#2A2A24] border-b-2 border-orange-500">10% DISCOUNT</span> on your order.
-            </p>
-
-            <button id="claimBtn" class="w-full py-3.5 px-6 bg-[#2A2A24] text-white font-semibold rounded-xl hover:bg-orange-600 shadow-md hover:shadow-orange-600/20 active:scale-[0.98] transition-all duration-200">
-                Ok Alora
-            </button>
-            
+        <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-wider mb-5">
+            <span>🔥</span> Limited Offer
         </div>
+
+        <h2 class="text-3xl font-extrabold tracking-tight mb-3">
+            Exclusive Deal!
+        </h2>
+
+        <p class="text-base leading-relaxed text-gray-600 mb-6">
+            Be one of the <span class="font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">First 100 Users</span> and grab a flat <span class="font-bold text-[#2A2A24] border-b-2 border-orange-500">10% DISCOUNT</span> on your order.
+        </p>
+
+        <button id="claimBtn" class="w-full py-3.5 px-6 bg-[#2A2A24] text-white font-semibold rounded-xl hover:bg-orange-600 shadow-md hover:shadow-orange-600/20 active:scale-[0.98] transition-all duration-200">
+            Ok Alora
+        </button>
+        
     </div>
+
+</div>
 
     <!-- ============ NAV ============ -->
    <div class="overflow-hidden bg-[#fb6900] p-2 shadow-sm border border-[#E3DAC6] ">

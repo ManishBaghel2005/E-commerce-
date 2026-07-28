@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getImageUrl } from "./config.js";
 
 // ===== Global State =====
 let PRODUCTS_DATABASE = [];
@@ -84,9 +84,7 @@ function normalizeAndAssignBestsellers(rawProducts) {
         if (rawCategory === 'skincare') rawCategory = 'skin';
         if (rawCategory === 'bodycare') rawCategory = 'body';
 
-        const imageSrc = product.imagepath 
-            ? (product.imagepath.startsWith('http') ? product.imagepath : `${BASE_URL}${product.imagepath}`) 
-            : '';
+        const imageSrc = getImageUrl(product.imagepath, '');
 
         const backendIsBestseller = Boolean(
             product.isBestseller === true || 
@@ -414,9 +412,7 @@ async function fetchAndShowSuggestions(query) {
         }
 
         suggestionsBox.innerHTML = matches.map(prod => {
-            const imgSrc = prod.imagepath 
-                ? (prod.imagepath.startsWith('http') ? prod.imagepath : `${BASE_URL}${prod.imagepath}`) 
-                : '';
+            const imgSrc = getImageUrl(prod.imagepath, '');
             const price = prod.price || (prod.variants && prod.variants[0] ? prod.variants[0].price : 'N/A');
 
             return `

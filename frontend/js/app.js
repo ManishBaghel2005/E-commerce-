@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getImageUrl } from "./config.js";
 
 // ==========================================
 // 1. GLOBAL CUSTOM SUCCESS MODAL
@@ -144,9 +144,7 @@ async function fetchSuggestions(query, suggestionsBox) {
         }
 
         suggestionsBox.innerHTML = productsList.map(prod => {
-            const imageSrc = prod.imagepath 
-                ? (prod.imagepath.startsWith("http") ? prod.imagepath : `${BASE_URL}${prod.imagepath}`)
-                : './static/placeholder.png';
+            const imageSrc = getImageUrl(prod.imagepath, './static/placeholder.png');
 
             // 🔥 Price validation fallback: Agar schema me key 'price' ki jagah kuch aur hai toh wo auto-pick ho jayega
             const finalPrice = prod.price || prod.discountprice || prod.productPrice || 'N/A';

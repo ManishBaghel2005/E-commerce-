@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getImageUrl } from "./config.js";
 
 async function loadAllProducts(){
     const tbody = document.getElementById("productTableBody");
@@ -20,7 +20,7 @@ async function loadAllProducts(){
         }
 
         tbody.innerHTML = products.map(p => {
-            const fullImgUrl = `${BASE_URL}${p.imagepath}`;
+            const fullImgUrl = getImageUrl(p.imagepath, './static/alora image 2.jpeg');
             
             // ✅ FIXED: Safe Base64 encoding without relying on deprecated escape/unescape methods
             const productDataStr = btoa(encodeURIComponent(JSON.stringify(p)));
@@ -109,7 +109,7 @@ function viewProduct(button){
         // ✅ FIXED: Safe Decoding complement matching the modern approach
         const product = JSON.parse(decodeURIComponent(atob(base64Data)));
         
-        document.getElementById('modalImg').src = `${BASE_URL}${product.imagepath}`;
+        document.getElementById('modalImg').src = getImageUrl(product.imagepath, './static/alora image 2.jpeg');
         document.getElementById('modalImg').alt = product.name;
         document.getElementById('modalName').innerText = product.name;
         document.getElementById('modalBadge').innerText = product.batchNumber || 'N/A';

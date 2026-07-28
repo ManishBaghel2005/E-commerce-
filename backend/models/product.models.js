@@ -45,7 +45,8 @@ const SimpleProductSchema = new mongoose.Schema({
 },
     imagepath: {
         type: String,
-        required: [true, 'Product image path zaroori hai']
+        required: false,
+        default: ''
     },
     galleryImages: [{ 
         type: String

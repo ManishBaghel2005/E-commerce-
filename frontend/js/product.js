@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getImageUrl } from "./config.js";
 
 // Global variables current selection store karne ke liye
 let currentProductData = null;
@@ -81,7 +81,7 @@ async function loadProductDetails() {
         // --- UI Updates ---
         const mainImg = document.getElementById('main-product-image');
         if (mainImg) {
-            mainImg.src = product.imagepath ? `${BASE_URL}${product.imagepath}` : "./static/placeholder.png";
+            mainImg.src = getImageUrl(product.imagepath, "./static/placeholder.png");
             mainImg.alt = product.name || "Product Image";
         }
 
@@ -189,7 +189,7 @@ function handleCartButtonClick(btnElement) {
     const targetVolumeText = currentSelectedVariant.volume || "Standard";
     const compositeCartUniqueIdKeyString = `${productId}_${targetVolumeText}`;
 
-    const targetProductImageSrc = currentProductData.imagepath ? `${BASE_URL}${currentProductData.imagepath}` : "./static/placeholder.png";
+    const targetProductImageSrc = getImageUrl(currentProductData.imagepath, "./static/placeholder.png");
 
     const existingItem = cart.find(item => item.uniqueCartItemKeyId === compositeCartUniqueIdKeyString);
 

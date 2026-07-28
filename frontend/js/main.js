@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getImageUrl } from "./config.js";
 
 document.addEventListener("partialsLoaded", () => {
 
@@ -72,6 +72,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!popup || !popupBox) return;
 
+    // Helper function safe localStorage saving ke liye
+    function setSeen() {
+        try {
+            localStorage.setItem('hasSeenDiscountPopup', 'true');
+            console.log("Saved to localStorage successfully!");
+        } catch (e) {
+            console.error("LocalStorage write error:", e);
+        }
+    }
+
+    // Check karo pehle se dikhaya gaya hai ya nahi
+    let hasSeenPopup = false;
+    try {
+        hasSeenPopup = localStorage.getItem('hasSeenDiscountPopup') === 'true';
+    } catch (e) {
+        console.error("LocalStorage read error:", e);
+    }
+
+    // Agar user dekh chuka hai toh execution ROK DO
+    if (hasSeenPopup) {
+        return;
+    }
+
+    // PAGE LOAD HOTE HI FLAG SAVE KAR DO
+    // (User ke button click karne ka wait mat karo taaki refresh/redirect par popup na aaye)
+    setSeen();
+
+    // Popup show karne ka timer
     setTimeout(() => {
         popup.classList.remove('opacity-0', 'pointer-events-none');
         popupBox.classList.remove('scale-95');
@@ -84,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popupBox.classList.remove('scale-100');
         popup.classList.add('opacity-0', 'pointer-events-none');
         popupBox.classList.add('scale-95');
+        setSeen(); // Safety backup
     }
 
     if (closePopupBtn) closePopupBtn.addEventListener('click', hidePopup);
@@ -468,7 +497,7 @@ async function loadSliderProducts() {
         }
 
         wrapper.innerHTML = top5Products.map((product) => {
-            const fullImgUrl = `${BASE_URL}${product.imagepath}`;
+            const fullImgUrl = getImageUrl(product.imagepath, './static/placeholder.png');
 
             const ratingCount = Math.round(product.rating || 4);
             let starsHTML = '';
