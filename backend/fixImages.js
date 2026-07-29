@@ -19,7 +19,7 @@ async function fixBrokenImages() {
             if (product) {
                 product.imagepath = '';
                 await product.save();
-                console.log(`✓ Fixed: ${product.name}`);
+                console.log(` Fixed: ${product.name}`);
             }
         }
 

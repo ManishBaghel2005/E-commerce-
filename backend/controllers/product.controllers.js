@@ -8,15 +8,18 @@ export const addnewproduct = async (req, res) => {
     try {
         let { name, description, category, rating, totalReviews, isAvailable } = req.body;
         
-        // 🚨 FIX: Agar frontend se Duplicate HTML name ki wajah se Array aaye toh pehli value nikaal lo
+        // 🚨 Duplicate HTML name handle karne ke liye
         if (Array.isArray(category)) {
-            category = category[0]; // "['combo', 'combo']" -> "combo"
+            category = category[0];
         }
 
         let variants = [];
         if (req.body.variants && req.body.variants !== "") {
             try {
-                variants = JSON.parse(req.body.variants);
+                // Agar variants string format me aaya hai toh parse karo, varna direct accept karo
+                variants = typeof req.body.variants === 'string' 
+                    ? JSON.parse(req.body.variants) 
+                    : req.body.variants;
             } catch (e) {
                 return res.status(400).json({ error: "Variants array parsing text format invalid hai!" });
             }
@@ -32,8 +35,21 @@ export const addnewproduct = async (req, res) => {
             variants 
         };
 
-        if (req.file) {
+        // 🖼️ Main Image Handling (Single Image)
+        if (req.files && req.files['imagepath'] && req.files['imagepath'].length > 0) {
+            addproduct.imagepath = `/uploads/${req.files['imagepath'][0].filename}`;
+        } else if (req.file) { 
+            // Fallback: Agar router me abhi bhi upload.single('imagepath') laga ho
             addproduct.imagepath = `/uploads/${req.file.filename}`;
+        }
+
+        // 🖼️ Gallery Images Handling (Multiple Images Array Fix)
+        if (req.files && req.files['galleryImages'] && req.files['galleryImages'].length > 0) {
+            addproduct.galleryImages = req.files['galleryImages'].map(
+                (file) => `/uploads/${file.filename}`
+            );
+        } else {
+            addproduct.galleryImages = []; // Agar photos upload na hui ho toh empty array rakho
         }
 
         const newProduct = new SimpleProduct(addproduct);
