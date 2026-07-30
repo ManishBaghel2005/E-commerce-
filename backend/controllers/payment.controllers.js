@@ -51,7 +51,12 @@ export const verifyPayment = async (req, res) => {
                 ? cart.reduce((sum, item) => sum + (item.price * item.qty), 0) 
                 : 0;
 
-            // Google Sheet Webhook Sync
+            // Item summary for WhatsApp / Pabbly (e.g. "Product A (2x), Product B (1x)")
+            const itemsSummary = Array.isArray(cart)
+                ? cart.map(item => `${item.name} (${item.qty}x)`).join(", ")
+                : "";
+
+            // 1. Google Sheet Webhook Sync (Existing Code)
             const googleSheetWebhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
             if (googleSheetWebhookUrl) {
                 fetch(googleSheetWebhookUrl, {
@@ -65,6 +70,28 @@ export const verifyPayment = async (req, res) => {
                         amount: totalAmount
                     })
                 }).catch(err => console.error("Google Sheet Sync Error:", err));
+            }
+
+            // 2. 🔥 PABBLY WEBHOOK SYNC (Naya Add Kiya Gaya Hai)
+            const pabblyWebhookUrl = process.env.PABBLY_WEBHOOK_URL; // .env me URL daalein
+            if (pabblyWebhookUrl) {
+                fetch(pabblyWebhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        event: "payment_success",
+                        order_id: razorpay_order_id,
+                        payment_id: razorpay_payment_id,
+                        customer_name: customer?.name || "",
+                        customer_phone: customer?.phone || "",
+                        customer_address: customer?.address || "",
+                        items: itemsSummary,
+                        total_amount: totalAmount,
+                        date: new Date().toLocaleDateString('en-IN')
+                    })
+                })
+                .then(() => console.log("✅ Pabbly Webhook Sent Successfully!"))
+                .catch(err => console.error("❌ Pabbly Webhook Error:", err));
             }
 
             return res.status(200).json({ 
