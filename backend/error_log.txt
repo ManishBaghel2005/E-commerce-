@@ -1,0 +1,12 @@
+Controller Error: ValidationError: SimpleProduct validation failed: category: test-category valid category nahi hai. Choose from: skin, face, cream, body, combo, variants: Kam se kam ek product variant hona zaroori hai
+    at model.validate (D:\bugfixalora\E-commerce-\backend\node_modules\mongoose\lib\document.js:2864:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.$__save (D:\bugfixalora\E-commerce-\backend\node_modules\mongoose\lib\model.js:399:7)
+    at async maybeTracedSave (D:\bugfixalora\E-commerce-\backend\node_modules\mongoose\lib\model.js:675:7)
+    at async addnewproduct (file:///D:/bugfixalora/E-commerce-/backend/controllers/product.controllers.js:33:30)
+Controller Error: ValidationError: SimpleProduct validation failed: category: test-category valid category nahi hai. Choose from: skin, face, cream, body, combo
+    at model.validate (D:\bugfixalora\E-commerce-\backend\node_modules\mongoose\lib\document.js:2864:36)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.$__save (D:\bugfixalora\E-commerce-\backend\node_modules\mongoose\lib\model.js:399:7)
+    at async maybeTracedSave (D:\bugfixalora\E-commerce-\backend\node_modules\mongoose\lib\model.js:675:7)
+    at async addnewproduct (file:///D:/bugfixalora/E-commerce-/backend/controllers/product.controllers.js:33:30)

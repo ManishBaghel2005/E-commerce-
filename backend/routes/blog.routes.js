@@ -1,6 +1,5 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
+import upload from '../middlewares/cloudinaryUpload.js';
 import { 
     createBlogPost, 
     getAllBlogs, 
@@ -10,18 +9,6 @@ import {
 } from '../controllers/blog.controllers.js';
 
 const router = express.Router();
-
-// Multer Disk Storage Configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Generates unique filename
-    }
-});
-
-const upload = multer({ storage });
 
 // ==========================================
 // API Endpoints

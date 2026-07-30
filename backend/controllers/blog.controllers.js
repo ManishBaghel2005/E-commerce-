@@ -1,4 +1,6 @@
 import Blog from '../models/blog.models.js';
+import fs from 'fs';
+import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
 
 // 1. Create and Publish Blog Post
 export const createBlogPost = async (req, res) => {
@@ -22,7 +24,7 @@ export const createBlogPost = async (req, res) => {
 
         let finalCover = coverUrl || "";
         if (req.file) {
-            finalCover = `/uploads/${req.file.filename}`;
+            finalCover = req.file.path; // Cloudinary URL
         }
 
         const newBlog = new Blog({
@@ -102,7 +104,11 @@ export const updateBlogPost = async (req, res) => {
         }
 
         if (req.file) {
-            updateData.coverImage = `/uploads/${req.file.filename}`;
+            const oldBlog = await Blog.findById(id);
+            if (oldBlog && oldBlog.coverImage) {
+                await deleteFromCloudinary(oldBlog.coverImage);
+            }
+            updateData.coverImage = req.file.path; // Cloudinary URL
         } else if (coverUrl) {
             updateData.coverImage = coverUrl;
         }
@@ -128,6 +134,10 @@ export const deleteBlogPost = async (req, res) => {
 
         if (!deletedBlog) {
             return res.status(404).json({ success: false, message: "Blog not found to delete." });
+        }
+
+        if (deletedBlog.coverImage) {
+            await deleteFromCloudinary(deletedBlog.coverImage);
         }
 
         return res.status(200).json({ success: true, message: "Blog deleted successfully!" });

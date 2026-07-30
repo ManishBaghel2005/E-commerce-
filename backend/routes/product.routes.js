@@ -1,45 +1,40 @@
-import express from    "express"
-import multer from "multer"
-import Path from "path"
-import { addnewproduct, deleteproduct, getproductbyid, readproduct, searchProducts, updateproduct } from "../controllers/product.controllers.js"
+import express from "express";
+import upload from "../middlewares/cloudinaryUpload.js";
+import { 
+    addnewproduct, 
+    deleteproduct, 
+    getproductbyid, 
+    readproduct, 
+    updateproduct 
+} from "../controllers/product.controllers.js";
 
-const router = express.Router()
+const router = express.Router();
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null,'./uploads');
-    },
-    filename:(req, file, cb)=>{
-        const newFileName = Date.now()+Path.extname(file.originalname);
-        cb(null, newFileName)
-    }
-})
+// 4. Routes Definition
 
-const fileFilter = (req, file, cb)=>{
-    if(file.mimetype.startsWith('image/')){
-        cb(null, true)
-    }else{
-        cb(new Error('only images are allowed'), false)
-    }
-}
+// GET: Saare products
+router.get("/all", readproduct);
 
-const upload = multer({
-    storage: storage,
-    fileFilter:fileFilter,
-    limits:{
-        fileSize:1024 *1024 * 5
-    }
-})
+// GET: Single product ID ke saath
+router.get("/:id", getproductbyid);
 
+// POST: Naya product add karne ke liye (Single Image Upload)
+// Post Route with custom Multer error handling
+router.post("/add", (req, res, next) => {
+    upload.single('imagepath')(req, res, (err) => {
+        if (err) {
+            // Multer error handling
+            return res.status(400).json({ error: err.message });
+        }
+        // Agar koi error nahi hai toh controller trigger hoga
+        addnewproduct(req, res, next);
+    });
+});
 
+// PUT: Product update karne ke liye (Single Image Upload optional)
+router.put("/update/:id", upload.single('imagepath'), updateproduct);
 
+// DELETE: Product aur uski image remove karne ke liye
+router.delete("/delete/:id", deleteproduct);
 
-
-router.post("/add",upload.single('imagepath'),addnewproduct)
-router.get("/all",readproduct)
-router.put("/update/:id",upload.single('imagepath'),updateproduct)
-router.delete("/delete/:id",deleteproduct)
-router.get('/search', searchProducts);
-router.get("/:id", getproductbyid)  
-
-export default router
+export default router;
