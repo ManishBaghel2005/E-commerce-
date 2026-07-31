@@ -3,7 +3,7 @@ import BASE_URL, { getImageUrl } from "./config.js";
 // ===== Global State =====
 let PRODUCTS_DATABASE = [];
 let selectedCategories = [];
-let maxPriceConstraint = 1500;
+let maxPriceConstraint = 2500;
 let ratingFloorFilter = 0;
 let activeQuickTag = 'all';
 let searchQuery = '';
