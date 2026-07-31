@@ -3,8 +3,13 @@ import { createOrder, verifyPayment, testConnection } from "../controllers/payme
 
 const router = express.Router();
 
+// 1. Razorpay Order Creation Route
 router.post("/create-order", createOrder);
+
+// 2. Razorpay Signature Verification & WhatsApp Notification Route
 router.post("/verify-payment", verifyPayment);
+
+// 3. Server Health Check / Connection Test Route
 router.get("/test-connect", testConnection);
 
 export default router;

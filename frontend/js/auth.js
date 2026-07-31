@@ -33,14 +33,11 @@ export function showSuccessModal(title, message, callback) {
 }
 
 // ==========================================
-// 2. ROUTE & GUARD LOGIC (FIXED)
+// 2. ROUTE & GUARD LOGIC
 // ==========================================
 function runAuthGuard() {
     const currentPath = window.location.pathname.toLowerCase();
-
-    // Stored credentials
     const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token") || localStorage.getItem("userToken");
 
     let user = null;
     let role = "";
@@ -48,20 +45,19 @@ function runAuthGuard() {
     if (storedUser) {
         try {
             user = JSON.parse(storedUser);
-            // Flexible Role Normalization
             role = user.role ? String(user.role).toLowerCase().trim() : "";
         } catch (e) {
             console.error("Invalid user JSON in localStorage", e);
         }
     }
 
-    // A) PUBLIC PAGES CHECK
     const isPublicPage = currentPath.endsWith("login.html") || 
+                         currentPath.endsWith("register.html") || 
                          currentPath.endsWith("index.html") || 
                          currentPath === "/" || 
                          currentPath.endsWith("/");
 
-    if (storedUser && user && isPublicPage) {
+    if (storedUser && user && isPublicPage && !currentPath.endsWith("index.html")) {
         if (role.includes("seo")) {
             window.location.replace("./seoadmin.html");
             return;
@@ -71,23 +67,20 @@ function runAuthGuard() {
         }
     }
 
-    // B) SEO PAGES PROTECTION GUARD
     const isSeoPage = currentPath.includes("seoadmin") || 
                       currentPath.includes("seoallpost") || 
                       currentPath.includes("seoadminupdate");
 
     if (isSeoPage) {
-        // Broad SEO role acceptance ("seoadmin", "seo", "admin")
         const isSeoUser = role.includes("seo") || role.includes("admin");
 
         if (!storedUser || !user || !isSeoUser) {
-            console.warn("Unauthorized access to SEO page. Clearing session & Redirecting...");
+            console.warn("Unauthorized access to SEO page. Redirecting...");
             localStorage.clear();
             window.location.replace("./login.html");
             return;
         }
 
-        // Welcome Name Render for SEO Panel
         const welcomeText = document.querySelector("main h2");
         if (welcomeText && user.name) {
             const currentText = welcomeText.innerText.toLowerCase();
@@ -97,7 +90,6 @@ function runAuthGuard() {
         }
     }
 
-    // C) ADMIN PAGES PROTECTION GUARD
     const adminPagesList = [
         "admin.html",
         "addnewproduct.html",
@@ -111,7 +103,7 @@ function runAuthGuard() {
 
     if (isAdminPage) {
         if (!storedUser || !user || !role.includes("admin")) {
-            console.warn("Unauthorized access to Admin page. Clearing session & Redirecting...");
+            console.warn("Unauthorized access to Admin page. Redirecting...");
             localStorage.clear();
             window.location.replace("./login.html");
             return;
@@ -119,13 +111,11 @@ function runAuthGuard() {
     }
 }
 
-// Run auth guard ONLY when document is ready
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", runAuthGuard);
 } else {
     runAuthGuard();
 }
-
 
 // ==========================================
 // 3. LOGOUT LOGIC
@@ -156,10 +146,61 @@ document.addEventListener("click", (e) => {
 });
 
 // ==========================================
-// 4. LOGIN & FORGOT PASSWORD FORM HANDLERS
+// 4. FORM HANDLERS (REGISTER, LOGIN, FORGOT)
 // ==========================================
 
-// 4.1 Login Form Handler
+// 4.1 NORMAL USER REGISTER FORM HANDLER
+function initRegisterForm() {
+    const registerForm = document.getElementById("registerForm") || document.getElementById("signupForm");
+    if (!registerForm) return;
+
+    const newForm = registerForm.cloneNode(true);
+    registerForm.parentNode.replaceChild(newForm, registerForm);
+
+    newForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const nameEl = document.getElementById("fullName") || document.getElementById("name") || document.getElementById("regName");
+        const emailEl = document.getElementById("regEmail") || document.getElementById("email");
+        const passwordEl = document.getElementById("regPassword") || document.getElementById("password");
+        const phoneEl = document.getElementById("phone") || document.getElementById("phoneNumber") || document.getElementById("regPhone");
+
+        if (!nameEl || !emailEl || !passwordEl || !phoneEl) {
+            showSuccessModal("Error", "Registration inputs ID missing. Check HTML input IDs!", null);
+            return;
+        }
+
+        const name = nameEl.value.trim();
+        const email = emailEl.value.trim();
+        const password = passwordEl.value;
+        const phone = phoneEl.value.trim();
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/auth/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password, phone }),
+                credentials: "include"
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showSuccessModal("Registration Successful!", data.message || "Account successful created!", () => {
+                    window.location.href = "./login.html";
+                });
+            } else {
+                showSuccessModal("Registration Failed", data.message || "Could not complete registration.", null);
+            }
+        } catch (error) {
+            console.error("Register Error:", error);
+            showSuccessModal("Error", "Server se contact nahi ho pa raha hai.", null);
+        }
+    });
+}
+
+// 4.2 LOGIN FORM HANDLER
 function initLoginForm() {
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
@@ -190,7 +231,6 @@ function initLoginForm() {
 
             if (response.ok && data.success !== false) {
                 const userData = data.user || data.data || {};
-                
                 const displayName = userData.name || userData.username || (userData.email ? userData.email.split('@')[0] : "User");
                 
                 const userObjToStore = {
@@ -228,7 +268,7 @@ function initLoginForm() {
     });
 }
 
-// 4.2 NEW: Forgot Password Form Handler
+// 4.3 FORGOT PASSWORD FORM HANDLER
 function initForgotForm() {
     const forgotForm = document.getElementById("forgotForm");
     if (!forgotForm) return;
@@ -261,7 +301,6 @@ function initForgotForm() {
 
             if (response.ok) {
                 showSuccessModal("Reset Link Sent", data.message || "Reset link aapki email par bhej diya gaya hai!", () => {
-                    // Switch back to Login view optional
                     const loginSection = document.getElementById('loginSection');
                     const forgotSection = document.getElementById('forgotSection');
                     if(loginSection && forgotSection) {
@@ -280,6 +319,7 @@ function initForgotForm() {
 }
 
 function initAuthForms() {
+    initRegisterForm();
     initLoginForm();
     initForgotForm();
 }

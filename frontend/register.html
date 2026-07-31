@@ -34,22 +34,47 @@
 
     <form id="registerForm" class="space-y-4">
       <div>
-        <label class="block text-gray-600 text-sm font-medium">Full Name</label>
-        <input type="text" id="name" required class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
+        <label for="name" class="block text-gray-600 text-sm font-medium">Full Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name"
+          placeholder="Enter your full name" 
+          required 
+          class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition"
+        />
       </div>
+
       <div>
-        <label class="block text-gray-600 text-sm font-medium">Email</label>
-        <input type="email" id="email" required class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
+        <label for="regEmail" class="block text-gray-600 text-sm font-medium">Email</label>
+        <input 
+          type="email" 
+          id="regEmail" 
+          name="email"
+          placeholder="Enter your email" 
+          required 
+          class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition"
+        />
       </div>
+
       <div>
-        <label class="block text-gray-600 text-sm font-medium">Password</label>
-        <input type="password" id="password" required class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
+        <label for="regPassword" class="block text-gray-600 text-sm font-medium">Password</label>
+        <input 
+          type="password" 
+          id="regPassword" 
+          name="password"
+          placeholder="••••••••" 
+          required 
+          class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition"
+        />
       </div>
+
       <div>
         <label for="phone" class="block text-sm font-medium text-gray-600">Phone Number</label>
         <input 
             type="tel" 
             id="phone" 
+            name="phone"
             required 
             pattern="[0-9]{10}" 
             maxlength="10"
@@ -59,7 +84,10 @@
             oninput="this.value = this.value.replace(/[^0-9]/g, '');" 
         />
       </div>
-      <button type="submit" class="w-full bg-[#2A2A24] text-white py-2.5 rounded-xl font-semibold hover:bg-orange-600 transition shadow-sm">Register</button>
+
+      <button type="submit" id="regSubmitBtn" class="w-full bg-[#2A2A24] text-white py-2.5 rounded-xl font-semibold hover:bg-orange-600 transition shadow-sm cursor-pointer">
+        Register
+      </button>
     </form>
 
     <p class="mt-6 text-center text-sm text-gray-600">
@@ -67,7 +95,7 @@
     </p>
   </div>
 
-  <!-- Custom Module Script Connection (Handling auth operations exclusively) -->
+  <!-- JS Connection -->
   <script type="module" src="./js/auth.js"></script>
 </body>
 </html>

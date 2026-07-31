@@ -1,6 +1,6 @@
 import BASE_URL from './config.js';
 
-// Helper: Cart read karne ke liye safe function (Matches cart.js logic)
+// Helper: Safe Cart Fetching
 function getSafeCart() {
     try {
         const primary = localStorage.getItem("glowCart");
@@ -9,11 +9,12 @@ function getSafeCart() {
         if (legacy) return JSON.parse(legacy);
         return [];
     } catch (e) {
+        console.error("Cart reading error:", e);
         return [];
     }
 }
 
-// Helper: Cart ko fully clear karne ke liye
+// Helper: Complete Cart Reset
 function clearAllCart() {
     localStorage.removeItem("glowCart");
     localStorage.removeItem("glowRitualCartData");
@@ -51,14 +52,14 @@ button?.addEventListener("click", async (e) => {
         return;
     }
 
-    // 3. Cart Items Extract (Safe Method)
+    // 3. Cart Items Extraction
     const cartItems = getSafeCart();
     if (cartItems.length === 0) {
         alert("Aapki cart khali hai! Kripya pehle product add karein.");
         return;
     }
 
-    // 4. Total Amount Calculate
+    // 4. Total Amount Calculation
     const billTotalElement = document.getElementById("bill-total");
     if (!billTotalElement) {
         alert("Bill Total Element nahi mila!");
@@ -87,11 +88,11 @@ button?.addEventListener("click", async (e) => {
         const orderData = await response.json();
 
         if (!orderData.order || !orderData.order.id) {
-            alert("Order ID generate nahi ho payi. Backend log check karein!");
+            alert("Order ID generate nahi ho payi. Server logs check karein!");
             return;
         }
 
-        // 6. Razorpay Configuration
+        // 6. Razorpay Configuration Options
         const options = {
             "key": orderData.razorpay_key_id,
             "amount": orderData.order.amount,
@@ -105,10 +106,10 @@ button?.addEventListener("click", async (e) => {
                 "customer_name": name
             },
             "handler": async function (response) {
-                console.log("Razorpay Response: ", response);
+                console.log("Razorpay Response:", response);
 
                 try {
-                    // Verification API Call
+                    // Verification & WhatsApp Notification API Call
                     const verifyResponse = await fetch(`${BASE_URL}/api/payments/verify-payment`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -124,17 +125,17 @@ button?.addEventListener("click", async (e) => {
                     const verificationResult = await verifyResponse.json();
 
                     if (verificationResult.status === "success") {
-                        // Cart ko poori tarah clear karein
+                        // Cart Clear karein
                         clearAllCart();
 
-                        // Success Popup dikhayein aur print invoice option dein
+                        // Success Popup & Print Option Show Karein
                         showPaymentSuccessPopup(verificationResult.orderData);
                     } else {
-                        alert("❌ Payment verification failed! Contact Support.");
+                        alert("❌ Payment verification failed! Support se sampark karein.");
                     }
                 } catch (error) {
-                    console.error("Verification error: ", error);
-                    alert("Verification API call fail ho gayi.");
+                    console.error("Verification Error:", error);
+                    alert("Verification API call fail ho gayi. Internet check karein!");
                 }
             },
             "prefill": {
@@ -150,12 +151,12 @@ button?.addEventListener("click", async (e) => {
         rzp.open();
 
     } catch (error) {
-        console.error("Error creating order: ", error);
-        alert("Connection failed! Backend server check karein.");
+        console.error("Error creating order:", error);
+        alert("Connection failed! Backend server offline lag raha hai.");
     }
 });
 
-// Success Popup & Print Receipt Function
+// Success Popup Modal Logic
 function showPaymentSuccessPopup(orderInfo) {
     const modal = document.createElement('div');
     modal.id = 'payment-success-modal';
@@ -199,7 +200,7 @@ function showPaymentSuccessPopup(orderInfo) {
     });
 }
 
-// Receipt Print Function
+// Receipt Printing Logic
 function printReceipt(info) {
     if (!info) return;
     
