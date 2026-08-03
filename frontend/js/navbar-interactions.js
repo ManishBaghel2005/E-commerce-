@@ -124,7 +124,7 @@ function initSearchFeature() {
                     }).join('');
                     suggestionsBox.classList.remove('hidden');
                 } else if (suggestionsBox) {
-                    suggestionsBox.innerHTML = `<p class="p-4 text-xs text-stone-500 text-center font-medium">Koi product nahi mila "<i>${query}</i>" ke liye</p>`;
+                    suggestionsBox.innerHTML = `<p class="p-4 text-xs text-stone-500 text-center font-medium">No products found."<i>${query}</i>" ke liye</p>`;
                     suggestionsBox.classList.remove('hidden');
                 }
             } catch (error) {

@@ -138,7 +138,7 @@ async function fetchSuggestions(query, suggestionsBox) {
         const productsList = data.products || [];
 
         if (productsList.length === 0) {
-            suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">Koi product nahi mila "<i>${query}</i>" ke liye</div>`;
+            suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">No products found."<i>${query}</i>" ke liye</div>`;
             suggestionsBox.classList.remove("hidden");
             return;
         }
